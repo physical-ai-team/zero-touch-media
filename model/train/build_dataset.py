@@ -4,7 +4,9 @@
 라벨은 Edge Impulse FOMO와 같은 방식: 얼굴 중심이 들어간 격자 칸 = 1.
 너무 작은 얼굴은 정답도 오답도 아닌 '무시' 칸(weight 0)으로 둔다.
 
-사용: python build_dataset.py <WIDER 폴더> <출력.npz> --split train|val [--max N] [--extra 폴더]
+사용: python build_dataset.py <WIDER 폴더> <출력.npz> --split train|val [--max N] [--frac-max 0.90]
+
+얼굴 크기 범위: v19는 15~55%(기본값), v20은 15~90%(--frac-max 0.90, 화면을 채우는 가까운 얼굴 포함).
 """
 import argparse
 import os
@@ -66,14 +68,14 @@ def make_sample(g, boxes, cx0, cy0, side):
     return x, y, wgt, n_face
 
 
-def crops_for(g, boxes, rng):
+def crops_for(g, boxes, rng, frac_min=0.15, frac_max=0.55):
     H, W = g.shape
     res = []
     big = [b for b in boxes if b[2] >= 12]
     if big:
-        # 얼굴 하나를 골라 그 얼굴이 15~55% 가 되도록 자른다
+        # 얼굴 하나를 골라 그 얼굴이 frac_min~frac_max 가 되도록 자른다
         bx, by, bw, bh, _ = rng.choice(big)
-        frac = rng.uniform(0.15, 0.55)
+        frac = rng.uniform(frac_min, frac_max)
         side = int(max(bw, bh) / frac)
         side = min(side, H, W)
         if side >= 24:
@@ -98,6 +100,7 @@ def main():
     ap.add_argument('wider'); ap.add_argument('out')
     ap.add_argument('--split', default='train'); ap.add_argument('--max', type=int, default=0)
     ap.add_argument('--seed', type=int, default=0)
+    ap.add_argument('--frac-min', type=float, default=0.15); ap.add_argument('--frac-max', type=float, default=0.55)
     a = ap.parse_args()
     rng = random.Random(a.seed)
     gt = read_gt(os.path.join(a.wider, 'wider_face_split', f'wider_face_{a.split}_bbx_gt.txt'))
@@ -110,7 +113,7 @@ def main():
         if img is None:
             continue
         g = gray(img)
-        for x, y, w, _ in crops_for(g, boxes, rng):
+        for x, y, w, _ in crops_for(g, boxes, rng, a.frac_min, a.frac_max):
             X.append(x); Y.append(y); Wt.append(w)
     X = np.stack(X); Y = np.stack(Y); Wt = np.stack(Wt)
     np.savez_compressed(a.out, x=X, y=Y, w=Wt)
