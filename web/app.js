@@ -25,6 +25,7 @@ window.onYouTubeIframeAPIReady = async () => {
     events: {
       onReady: () => { playerReady = true; apply(); },
       onStateChange: onPlayerStateChange,
+      onError: onPlayerError,
     },
   });
 };
@@ -64,12 +65,28 @@ function parseVideo(text) {
   return start ? { videoId: id, startSeconds: start } : { videoId: id };
 }
 
+// https://developers.google.com/youtube/iframe_api_reference#onError
+function onPlayerError(e) {
+  const reason = {
+    2: "영상 ID가 잘못됐습니다",
+    5: "브라우저에서 재생할 수 없는 영상입니다",
+    100: "영상이 없거나 비공개입니다",
+    101: "영상 주인이 다른 사이트 재생(임베드)을 막아 두었습니다. 다른 영상을 쓰세요",
+    150: "영상 주인이 다른 사이트 재생(임베드)을 막아 두었습니다. 다른 영상을 쓰세요",
+  }[e.data] || `유튜브 오류 ${e.data}`;
+  $("video-msg").textContent = `재생 불가: ${reason}`;
+}
+
 function loadVideo() {
   const v = parseVideo($("video-id").value);
   if (!v) { $("video-msg").textContent = "유튜브 주소나 영상 ID를 알아볼 수 없습니다"; return; }
-  if (!playerReady) return;
+  if (!playerReady) { $("video-msg").textContent = "유튜브 플레이어가 아직 준비되지 않았습니다. 잠시 뒤 다시 누르세요"; return; }
   player.cueVideoById(v);
-  $("video-msg").textContent = `불러옴: ${v.videoId}${v.startSeconds ? ` (${v.startSeconds}초부터)` : ""}`;
+  // 재생은 서버 판정을 따른다. 바로 재생되지 않는 이유를 같이 적는다.
+  const why = !started ? " — 위의 '시작' 버튼을 눌러야 재생됩니다"
+    : $("manual").checked ? " — 수동 모드: 플레이어에서 직접 재생하세요"
+    : serverState !== "present" ? " — 얼굴이 감지되면 재생됩니다" : "";
+  $("video-msg").textContent = `불러옴: ${v.videoId}${v.startSeconds ? ` (${v.startSeconds}초부터)` : ""}${why}`;
   try { localStorage.setItem("ztmc.video", $("video-id").value.trim()); } catch {}
   apply();
 }
