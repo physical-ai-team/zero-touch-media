@@ -26,9 +26,10 @@
 
 ## 남은 일
 **팀원1 박민성 (모델)**
-- [ ] Edge Impulse 공개 Face detection 프로젝트 고르기 → Clone → 공개 원본 그대로 Arduino library zip 받아 **팀원2에게 먼저 전달**
-- [ ] 학습·최적화(96×96 그레이스케일 FOMO 권장, 라벨 `face`) → 우리 모델 zip 전달
-- [ ] `model/README.md` 기록 표 채우기(정확도·RAM·Flash·보드 추론 ms, 공개 원본 vs 우리 모델)
+- [x] 공개 원본(public/96468) 복제 → Arduino library v17 zip (10-30)
+- [x] 비교 실험 6개 → **E3 64×64 흑백 채택**(test F1 0.69→0.82, 추정 728→280ms) → v18 zip. 기록 `model/experiments.md`, zip `C:\dev\ei-zips\`
+- [ ] 팀원2에게 v17·v18 zip 전달(이 PC의 컴파일 세션에는 전달함), 보드 실측 `infer_ms`를 받아 `model/README.md` 표 채우기
+- [ ] (시간 남으면) 시연 장소·카메라로 찍은 얼굴/배경 사진을 추가 학습 → 오탐 줄이기
 
 **팀원2 (펌웨어)**
 - [ ] 보드명 확인 후 `docs/04-firmware.md` 보드 줄 고치기
