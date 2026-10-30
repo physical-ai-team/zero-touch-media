@@ -38,13 +38,12 @@ function onDetect(m) {
   count += 1;
   samples.push({ t: now, face: m.face, score: m.score });
 
+  const label = m.face ? "Face Detected" : "Face Not Detected";
   if (m.face !== lastFace) {
-    log(`${m.device_id}: ${m.face ? "Face Detected" : "Face Not Detected"} (score ${m.score.toFixed(2)}, #${m.seq})`, m.face ? "on" : "off");
+    log(`${m.device_id}: ${label} (score ${m.score.toFixed(2)}, #${m.seq})`, m.face ? "on" : "off");
     lastFace = m.face;
   }
-  $("face").dataset.face = m.face ? "yes" : "no";
-  $("face-label").textContent = m.face ? "Face Detected" : "Face Not Detected";
-  $("face-sub").textContent = `${m.device_id} · 얼굴 ${m.count}개 · #${m.seq}`;
+  setFace(m.face ? "yes" : "no", label, `${m.device_id} · 얼굴 ${m.count}개 · #${m.seq}`, `${label} · ${m.score.toFixed(2)}`);
   $("score-val").textContent = m.score.toFixed(2);
   $("bar-fill").style.width = `${Math.min(1, m.score) * 100}%`;
   $("bar-fill").className = m.score >= cfg.min_score ? "ok" : "low";
@@ -68,9 +67,7 @@ setInterval(() => {
   $("hz").textContent = lastAt ? `${(recent / 2).toFixed(1)} Hz` : "-";
   if (lastAt && now - lastAt > cfg.device_timeout_ms) {
     if ($("face").dataset.face !== "stale") log("detect 신호 끊김", "warn");
-    $("face").dataset.face = "stale";
-    $("face-label").textContent = "신호 없음";
-    $("face-sub").textContent = `마지막 수신 ${((now - lastAt) / 1000).toFixed(1)}초 전`;
+    setFace("stale", "신호 없음", `마지막 수신 ${((now - lastAt) / 1000).toFixed(1)}초 전`, "보드 신호 없음");
     lastFace = null;
   }
   drawTimeline(now);
@@ -108,6 +105,78 @@ function drawTimeline(now) {
   samples.forEach((s, i) => (i ? ctx.lineTo : ctx.moveTo).call(ctx, x(s.t), h * (1 - Math.min(1, s.score))));
   ctx.stroke();
 }
+
+// 큰 표시와 웹캠 배지를 함께 바꾼다. 웹캠 박스는 PiP 창으로 옮겨질 수 있어 id 대신 변수로 잡아 둔다.
+function setFace(kind, label, sub, badge) {
+  $("face").dataset.face = kind;
+  $("face-label").textContent = label;
+  $("face-sub").textContent = sub;
+  cam.dataset.face = kind;
+  camBadge.textContent = badge;
+}
+
+// ---------- PC 웹캠 + PiP ----------
+// Chrome·Edge: Document PiP로 웹캠+감지 배지를 항상 위 창에 띄운다. 그 밖의 브라우저: 영상만 PiP.
+// getUserMedia는 localhost 또는 https에서만 된다(다른 PC에서 http://IP 로 열면 웹캠 못 씀).
+
+const cam = $("cam");
+const camVideo = $("cam-video");
+const camBadge = $("cam-badge");
+let camStream = null;
+let pipWin = null;
+
+$("cam-on").onclick = async () => {
+  if (camStream) {
+    if (pipWin) pipWin.close();
+    camStream.getTracks().forEach((t) => t.stop());
+    camStream = null;
+    cam.hidden = true;
+    $("cam-on").textContent = "웹캠 켜기";
+    $("cam-pip").disabled = true;
+    return;
+  }
+  if (!navigator.mediaDevices) {
+    log("웹캠은 localhost(또는 https)에서만 열 수 있습니다", "warn");
+    return;
+  }
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false });
+  } catch (e) {
+    log(`웹캠을 열지 못했습니다: ${e.name}`, "warn");
+    return;
+  }
+  camVideo.srcObject = camStream;
+  cam.hidden = false;
+  $("cam-on").textContent = "웹캠 끄기";
+  $("cam-pip").disabled = false;
+};
+
+$("cam-pip").onclick = async () => {
+  if (pipWin) { pipWin.close(); return; }
+  if (!("documentPictureInPicture" in window)) {
+    await camVideo.requestPictureInPicture().catch((e) => log(`PiP 실패: ${e.name}`, "warn"));
+    return;
+  }
+  pipWin = await documentPictureInPicture.requestWindow({ width: 360, height: 290 });
+  // PiP 창은 빈 문서라 스타일을 절대 주소로 다시 건다.
+  document.querySelectorAll('link[rel="stylesheet"]').forEach((l) => {
+    const link = pipWin.document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = l.href;
+    pipWin.document.head.append(link);
+  });
+  pipWin.document.title = "ZTMC 웹캠";
+  pipWin.document.body.className = "pip";
+  pipWin.document.body.append(cam);
+  camVideo.play();
+  $("cam-pip").textContent = "PiP 닫기";
+  pipWin.addEventListener("pagehide", () => {
+    $("cam-card").append(cam);
+    camVideo.play();
+    pipWin = null;
+    $("cam-pip").textContent = "PiP 창으로";
+  });
+};
 
 // ---------- 서버 WebSocket ----------
 

@@ -53,6 +53,8 @@
 
 **팀원3 (브로커·서버·웹)**
 - [x] 얼굴 감지 신호 모니터: 터미널 `python tools\monitor.py`(브로커 직접 구독, 서버 없이도 됨), 웹 <http://localhost:8000/monitor.html>
+- [x] 모니터 페이지에 PC 웹캠 PiP 창(감지 배지 겹쳐 표시) 추가
+- [ ] 웹캠 PiP를 Chrome/Edge에서 직접 확인(자동 시험 못 함)
 - [ ] 실제 보드 신호를 `tools\monitor.py`로 확인(팀원2 `USE_FAKE_DETECT 1` 업로드 후)
 - [ ] 시연 PC Windows 방화벽 1883 인바운드 허용 — 관리자 PowerShell:
       `New-NetFirewallRule -DisplayName "Mosquitto 1883" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow`
