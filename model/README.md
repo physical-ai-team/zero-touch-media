@@ -11,11 +11,11 @@
 ## 기록 (발표 자료용)
 선택 과정 전체(후보 고르기 → Edge Impulse 개선 → 로컬 학습 → 보드 실측)는 [model-selection.md](model-selection.md).
 실험 전체와 이유는 [experiments.md](experiments.md). F1은 test set(float32), RAM·Flash·추정 ms는 int8 + EON의 ESP-EYE 추정치.
-보드 추론 ms는 팀원2가 붙인 뒤 채운다.
+보드 추론 ms는 XIAO ESP32S3 Sense 실측(카메라 입력 스케치). 인수인계는 [firmware-handoff.md](firmware-handoff.md).
 
 | 버전 | Edge Impulse 프로젝트 링크 | 입력 | 모델 | 정확도(F1) | RAM | Flash | 추정 ms | 보드 추론 ms | 날짜 |
 |---|---|---|---|---|---|---|---|---|---|
-| 공개 원본 (zip v17) | [public/96468](https://studio.edgeimpulse.com/public/96468/latest) → 복제 [1152773](https://studio.edgeimpulse.com/studio/1152773) impulse 1 | 96×96 흑백 | FOMO MNv2 0.1 | 0.69 | 240K | 63.6K | 728 | | 10-30 |
+| 공개 원본 (zip v17) | [public/96468](https://studio.edgeimpulse.com/public/96468/latest) → 복제 [1152773](https://studio.edgeimpulse.com/studio/1152773) impulse 1 | 96×96 흑백 | FOMO MNv2 0.1 | 0.69 | 240K | 63.6K | 728 | **크래시**(보드, EON, 코어 3.3.12) | 10-30 |
 | 우리 학습 v1 (zip v18, E3) | [1152773](https://studio.edgeimpulse.com/studio/1152773) impulse 5 | **64×64** 흑백 | FOMO MNv2 0.1, LR 0.001, 증강 | **0.82** | **69K** | 68.8K | **280** | | 10-30 |
 | 우리 학습 v2 (zip v19, L3, **로컬**) | `model/train/` (WIDER FACE, EI 학습 시간 소진으로 로컬) | 64×64 흑백 | FOMO MNv2 0.1(처음부터), 얼굴 가중치 10, 임계값 0.6, TFLite Micro | WIDER 검증 **0.748** (같은 기준 v18 0.642) | arena 128K | 모델 41K | PC 4.4ms (v18 9.9ms) | **50** (dsp 2) | 10-30 |
 
