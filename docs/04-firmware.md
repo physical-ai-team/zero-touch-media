@@ -18,7 +18,7 @@
 ## config.h 값
 | 값 | 기본 | 뜻 |
 |---|---|---|
-| `FACE_THRESHOLD` | 0.6 | 이 점수 이상인 얼굴이 있으면 `face=true` |
+| `FACE_THRESHOLD` | 0.7 | 이 점수 이상인 얼굴이 있으면 `face=true` (D-008, 이전 0.6) |
 | `USE_FAKE_DETECT` | 1 | 1이면 카메라·모델 없이 가짜 detect |
 | `FRAME_INTERVAL_MS` | 500 | 카메라 JPEG를 `ztmc/{id}/frame`으로 보내는 간격(웹 PiP용, 판정에 안 씀). 0이면 끔 |
 | `CAPTURE_MODE` | 꺼짐 | 켜면 추론 대신 흑백 `FRAME W H <hex>`를 시리얼로(팀원4 `model/testing/capture.py`) |
@@ -37,7 +37,9 @@
 - **색 순서**: 코어 3.3.x의 `fmt2rgb888`은 RGB 순서다. Edge Impulse 예제처럼 BGR로 뒤집으면 모델이 얼굴을 못 찾는다.
 - **USB 시리얼 막힘**: PC가 시리얼을 안 읽으면 출력마다 막혀 detect가 초당 4회 → 0.4회로 떨어진다. `Serial.setTxTimeoutMs(0)`으로 해결.
 - 카메라는 **보는 화면 쪽(모니터 위)**에 둔다. 옆에 두면 화면을 볼 때 옆얼굴이 되어 못 잡는다.
-- 보드 Wi-Fi 수신이 약하다(안테나 점검 전). 폰 핫스팟을 보드 가까이.
+- **안테나(U.FL)를 꼭 끼운다.** 빠져 있으면 PC가 100%로 받는 핫스팟도 보드는 -87 dBm, 공유기 -92 dBm(주변 AP 2개만 보임)이라 접속이 불안정하다. 끼우면 핫스팟 -22 dBm, 공유기 -52 dBm, AP 24개. 커넥터를 위에서 수직으로 눌러 딸깍 소리가 나야 한다.
+- **Wi-Fi 절전 끔(`WiFi.setSleep(false)`)**: 기본 절전(modem sleep)은 전송을 수백 ms씩 밀어 detect가 3초 넘게 끊기곤 했다(서버 `no_device` → 영상 멈춤). 끄니 2분씩 두 번 재서 끊김 0번.
+- `frame`(사진 8KB)은 수신이 약하면 전송이 막혀 detect와 keepalive까지 밀린다. 안테나 없이 0.5초 간격이면 몇십 초마다 끊김 → 안테나 연결 후 2분에 1번 정도. 공용 Wi-Fi이거나 수신이 약하면 `FRAME_INTERVAL_MS 0`.
 
 ## 한글 사용자 이름 PC
 사용자 폴더가 `C:\Users\홍길동`처럼 한글이면 링크 단계에서 `cannot find -lxtensa` / `cannot open output file ... .elf`로 실패한다(코어가 AppData 아래에 있어서). PowerShell에서:

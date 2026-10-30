@@ -27,7 +27,7 @@ class Settings:
     face_on_ms: int = field(default_factory=lambda: int(_env("FACE_ON_MS", "300")))
     face_off_ms: int = field(default_factory=lambda: int(_env("FACE_OFF_MS", "1500")))
     min_score: float = field(default_factory=lambda: float(_env("MIN_SCORE", "0.6")))
-    device_timeout_ms: int = field(default_factory=lambda: int(_env("DEVICE_TIMEOUT_MS", "3000")))
+    device_timeout_ms: int = field(default_factory=lambda: int(_env("DEVICE_TIMEOUT_MS", "6000")))
 
     player_detect_hz: float = field(default_factory=lambda: float(_env("PLAYER_DETECT_HZ", "10")))
     player_frame_hz: float = field(default_factory=lambda: float(_env("PLAYER_FRAME_HZ", "5")))

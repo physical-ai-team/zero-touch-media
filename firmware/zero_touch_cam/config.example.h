@@ -12,8 +12,9 @@
 #define DEVICE_ID     "cam-1"
 
 // --- 판정 ---
-// 이 값 이상인 얼굴이 하나라도 있으면 face=true. 서버의 MIN_SCORE 와 맞춘다.
-#define FACE_THRESHOLD 0.6f
+// 이 값 이상인 얼굴이 하나라도 있으면 face=true. 서버 MIN_SCORE(0.6)보다 높아서 이 값이 실제 기준이 된다.
+// 0.7: v19 실측에서 앉은 정면은 대부분 0.9 근처라 여유가 있고, 빈자리 오탐(점수가 가끔 튀는 것)을 줄인다.
+#define FACE_THRESHOLD 0.7f
 
 // 1 이면 카메라·모델 없이 5초마다 얼굴 있음/없음을 번갈아 보낸다(연결 시험용).
 // Edge Impulse 모델을 붙이면 0 으로 바꾼다.

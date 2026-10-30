@@ -25,7 +25,7 @@
   - 권장: 추론에 쓰는 그 프레임(320×240 흑백)을 `frame2jpg(fb, 60, &jpg, &len)`(`img_converters.h`)로 JPEG 변환, 수 KB.
   - PubSubClient 버퍼(512)보다 크므로 나눠 보낸다: `mqtt.beginPublish(topicFrame, len, false); mqtt.write(jpg, len); mqtt.endPublish(); free(jpg);`
   - 빈도는 `config.h`의 값으로(예 `FRAME_INTERVAL_MS 500`). Wi-Fi가 약하면 늘리거나 끈다. 서버는 `FRAME_MAX_BYTES`(기본 100000)보다 크거나 JPEG가 아니면 버린다.
-- keepalive **5초** → 갑자기 끊기면 약 7.5초 뒤 브로커가 `offline` 발행. 서버는 그보다 먼저 `DEVICE_TIMEOUT_MS`(3초) 동안 detect가 없으면 장치 없음으로 본다.
+- keepalive **5초** → 갑자기 끊기면 약 7.5초 뒤 브로커가 `offline` 발행. 서버는 그보다 먼저 `DEVICE_TIMEOUT_MS`(6초) 동안 detect가 없으면 장치 없음으로 본다.
 
 ## MQTT — 서버 → 브로커
 - `ztmc/state` (QoS 1, retain): 아래 `state` 메시지와 같은 JSON. 다른 장치(LED 등)가 구독해 쓸 수 있다.
@@ -54,6 +54,6 @@
 | `FACE_ON_MS` | 300 | 얼굴이 계속 보여야 present |
 | `FACE_OFF_MS` | 1500 | 얼굴이 계속 안 보여야 absent (잠깐 고개 돌림은 무시) |
 | `MIN_SCORE` | 0.6 | 서버 쪽 추가 기준 |
-| `DEVICE_TIMEOUT_MS` | 3000 | detect가 없으면 no_device |
+| `DEVICE_TIMEOUT_MS` | 6000 | detect가 없으면 no_device (D-008, 이전 3000) |
 
 no_device에서 detect가 오면 absent부터 다시 시작한다(바로 재생하지 않음).

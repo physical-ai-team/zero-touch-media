@@ -23,7 +23,7 @@
 - 확인 못 함: 브라우저에서 유튜브 실제 재생/정지, 실제 보드 업로드·MQTT 접속, Edge Impulse 모델.
 - 역할: 팀원1 박민성(모델), 팀원2(펌웨어), 팀원3(브로커·서버·웹), 팀원4(시연 데이터·실제 정확도 측정, 10-30 합류) — 팀원2·3·4 이름은 정해지면 `CLAUDE.md`·`docs/07-team.md`에 적는다.
 - 보드: ESP32-S3, PSRAM 8MB, 플래시 8MB(esptool 확인). XIAO ESP32S3 Sense로 추정, 정확한 보드명 미확인.
-- 실제 보드 확인(팀원2): `USE_FAKE_DETECT 1` 업로드 → 폰 핫스팟 Wi-Fi → MQTT → 서버 → 웹 유튜브 재생/정지까지 동작. 보드 Wi-Fi 수신이 약함(공유기 앞 -65 dBm, 자리 -92 dBm) → 안테나 점검 전까지 핫스팟을 보드 가까이.
+- 실제 보드 확인(팀원2): `USE_FAKE_DETECT 1` 업로드 → 폰 핫스팟 Wi-Fi → MQTT → 서버 → 웹 유튜브 재생/정지까지 동작. 끊김 원인은 **안테나 빠짐**(-92 → 끼운 뒤 -52 dBm)과 **Wi-Fi 절전**이었고 둘 다 해결(10-30 시연 후).
 - **실제 추론 펌웨어(팀원2)**: v19 모델로 카메라 → 추론 → MQTT detect(dsp 2ms, infer 51ms, 초당 약 7회) + 카메라 JPEG `frame`(초당 2장, 웹 PiP용). 앉은 정면 평균 score 0.92. EON 크래시 원인(`ei_calloc` 정렬)을 찾아 펌웨어에서 해결. 상세 `docs/04-firmware.md` "위험·겪은 문제".
 - 설계 근거: `docs/superpowers/specs/2026-10-30-skeleton-design.md`, `docs/decisions.md`.
 
@@ -48,12 +48,14 @@
 **팀원2 (펌웨어)**
 - [x] 보드 줄 고치기(조아람이 실측값으로, PR #6), 카메라 센서는 OV3660 확인
 - [x] `config.h` 만들고 `USE_FAKE_DETECT 1`로 업로드 → `mosquitto_sub -t "ztmc/#" -v`로 hello/detect 확인
-- [ ] 안테나(U.FL) 연결 점검 — 공유기 앞에서도 -65 dBm. 정상이면 -30~-40 dBm
+- [x] 안테나(U.FL) 연결 — 빠져 있었음. 끼우니 핫스팟 -87 → -22 dBm, 공유기 -92 → -52 dBm
+- [x] Wi-Fi 절전 끔(`WiFi.setSleep(false)`) — 영상 끈 상태 2분×2번 끊김 0번
 - [x] Edge Impulse 라이브러리 코어 3.3.12 빌드 확인(v17 EON·v19 둘 다, 코어 내릴 필요 없음)
 - [x] `run_inference()` 구현 → `USE_FAKE_DETECT 0`, v19로 `infer_ms` 51·`dsp_ms` 2 실측
 - [x] `frame` 토픽 펌웨어 쪽 구현(`FRAME_INTERVAL_MS`, 기본 500) — 서버가 받는 것 확인(10초 17장, bad 0). 웹 PiP 표시는 브라우저 확인 필요
 - [x] 캡처 모드(`CAPTURE_MODE`) — 팀원4 `capture.py`로 3장 저장 확인
-- [ ] 얼굴 없음 오탐률·판정값(`FACE_THRESHOLD`) 확정 — 팀원3·4 측정과 같이
+- [x] 판정값 팀 기본값 변경(D-008): `FACE_THRESHOLD` 0.7, `DEVICE_TIMEOUT_MS` 6000
+- [ ] 얼굴 없음 오탐률을 v19로 측정해 0.7이 맞는지 확인 — 팀원4 `measure.py`와 같이
 - [ ] 팀원1에게: EON 크래시 원인은 `ei_calloc` 정렬(펌웨어에서 해결) → `model/firmware-handoff.md` "피해야 할 것" 갱신 요청
 
 **팀원3 (브로커·서버·웹)**
