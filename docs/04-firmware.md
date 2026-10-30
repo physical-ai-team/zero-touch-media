@@ -3,7 +3,7 @@
 코드: [firmware/zero_touch_cam/](../firmware/zero_touch_cam/). 규격: [03-protocol.md](03-protocol.md).
 
 ## 보드
-- ESP32-S3, PSRAM 8MB, 플래시 8MB (esptool 확인). XIAO ESP32S3 Sense로 추정 → 보드 `XIAO_ESP32S3`(`esp32:esp32:XIAO_ESP32S3`). 보드명을 확인하면 이 줄을 고친다.
+- ESP32-S3 (QFN56) rev0.2, PSRAM 8MB, 플래시 8MB (esptool 및 FQBN esp32:esp32:XIAO_ESP32S3:PSRAM=opi 실측 완료)
 - Arduino IDE: 도구 → PSRAM **OPI PSRAM** 켜기(모델·카메라 버퍼에 필요).
 - 라이브러리: `PubSubClient` 2.8, `ArduinoJson` 7.x (라이브러리 매니저).
 
