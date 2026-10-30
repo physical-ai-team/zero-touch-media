@@ -253,6 +253,7 @@ void connectWifi() {
   if (WiFi.status() == WL_CONNECTED) return;
   Serial.printf("[wifi] connecting to %s", WIFI_SSID);
   WiFi.mode(WIFI_STA);
+  WiFi.setSleep(false);  // 기본 절전(modem sleep)은 전송을 수백 ms씩 밀어, 약한 신호에서 detect 가 3초 넘게 끊긴다
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
