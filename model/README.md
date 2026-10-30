@@ -1,4 +1,4 @@
-# 모델 (담당: 팀원1)
+# 모델 (담당: 팀원1 박민성)
 
 ## 순서
 1. Edge Impulse 공개 프로젝트 검색: <https://www.edgeimpulse.com/projects/all?project=Face%20detection&projectTypes=object-detection>
@@ -6,6 +6,7 @@
 3. 대상 장치 **Espressif ESP-EYE (ESP32 240MHz)** 또는 ESP32-S3 계열로 설정, 입력 96×96 그레이스케일 FOMO 권장(작고 빠름).
 4. 학습 → Model testing으로 정확도 확인 → **Deployment → Arduino library** → zip 다운로드.
 5. zip은 git에 올리지 않는다. 팀원2에게 전달(메신저/드라이브)하고 아래 표를 채운다.
+6. 공개 원본 모델 zip도 먼저 받아 팀원2에게 넘긴다 — 팀원2가 학습을 기다리지 않고 바로 이식을 시작할 수 있다.
 
 ## 기록 (발표 자료용)
 | 버전 | Edge Impulse 프로젝트 링크 | 입력 | 모델 | 정확도(F1) | RAM | Flash | 보드 추론 ms | 날짜 |

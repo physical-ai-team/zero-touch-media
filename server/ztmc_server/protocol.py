@@ -1,6 +1,6 @@
 """메시지 형식. 기준 문서는 docs/03-protocol.md — 둘이 다르면 이 코드가 맞고, 문서를 고친다.
 
-공통 규칙: 모르는 필드는 무시(extra="ignore"). 필드 추가는 자유, 삭제·이름 변경은 팀장 확인.
+공통 규칙: 모르는 필드는 무시(extra="ignore"). 필드 추가는 자유, 삭제·이름 변경은 세 명 합의.
 """
 
 from __future__ import annotations

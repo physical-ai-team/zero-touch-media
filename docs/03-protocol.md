@@ -1,7 +1,7 @@
 # 3. 프로토콜
 
 - 기준 코드: [server/ztmc_server/protocol.py](../server/ztmc_server/protocol.py). 문서와 다르면 코드가 맞다(그리고 문서를 고친다).
-- JSON 텍스트. 모르는 필드·모르는 `type`은 무시. 필드 **추가는 자유**, 삭제·이름 변경은 팀장 확인.
+- JSON 텍스트. 모르는 필드·모르는 `type`은 무시. 필드 **추가는 자유**, 삭제·이름 변경은 세 명 합의.
 - 시각은 **서버 시계 epoch ms**. ESP32 시계는 맞추지 않으므로 ESP32는 **걸린 시간(ms)** 만 보낸다.
 - 토픽 앞부분 `ztmc`는 `.env`의 `MQTT_TOPIC_PREFIX`, `cam-1`은 펌웨어 `DEVICE_ID`.
 
