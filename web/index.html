@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zero-Touch Media</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 뼈대용 최소 페이지. 디자인과 추가 기능은 웹 담당(docs/05-web.md). -->
+  <header>
+    <h1>Zero-Touch Media</h1>
+    <span id="conn" class="badge off">서버 연결 중…</span>
+  </header>
+
+  <main>
+    <div id="player-wrap">
+      <div id="player"></div>
+      <button id="start" type="button">시작 (자동재생 허용)</button>
+    </div>
+
+    <section id="status">
+      <div>판정: <strong id="state">-</strong></div>
+      <div>장치: <span id="device">-</span></div>
+      <div>최근 인식: <span id="detect">-</span></div>
+      <div>플레이어: <span id="player-state">-</span></div>
+    </section>
+
+    <section id="controls">
+      <label>영상 ID <input id="video-id" size="14"></label>
+      <button id="load" type="button">불러오기</button>
+      <label><input id="manual" type="checkbox"> 수동 모드 (서버 판정 무시)</label>
+    </section>
+  </main>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="app.js"></script>
+</body>
+</html>

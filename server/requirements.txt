@@ -1,0 +1,6 @@
+# 서버 실행 의존성. 버전을 바꾸면 docs/decisions.md 에 이유를 남긴다.
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.1
+python-dotenv==1.2.4
+paho-mqtt==2.1.0

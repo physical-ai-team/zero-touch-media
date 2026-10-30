@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+logs/
+# 펌웨어 비밀값(Wi-Fi 비밀번호 등)
+firmware/**/config.h
+# Edge Impulse 배포 zip·압축 해제본은 크기가 커서 넣지 않는다 (model/README.md 참고)
+*.zip
+model/export/
+.vscode/

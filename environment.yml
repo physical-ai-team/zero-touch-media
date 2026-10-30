@@ -1,0 +1,12 @@
+# 로컬 개발용 conda 환경. 패키지 버전은 여기 적지 않는다 — 기준은 각 requirements 파일뿐.
+#   최초 생성:  conda env create -f environment.yml
+#   갱신:       conda env update -f environment.yml --prune
+name: ztmc
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - -r server/requirements.txt
+      - -r requirements-dev.txt

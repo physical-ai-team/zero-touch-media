@@ -1,0 +1,17 @@
+/* 뼈대용 최소 스타일. 디자인은 웹 담당. */
+:root { --bg: #f6f5f2; --fg: #1d1d1f; --muted: #6b6b70; --ok: #1f8a4c; --warn: #b4521b; --off: #8a8a8f; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, "Malgun Gothic", sans-serif; background: var(--bg); color: var(--fg); }
+header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+h1 { font-size: 1.2rem; margin: 0; }
+main { max-width: 960px; margin: 0 auto; padding: 0 16px 24px; }
+#player-wrap { position: relative; aspect-ratio: 16 / 9; background: #000; }
+#player-wrap iframe, #player { width: 100%; height: 100%; }
+#start { position: absolute; inset: 0; margin: auto; width: 220px; height: 56px; font-size: 1rem; cursor: pointer; }
+#status, #controls { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 12px; }
+.badge { padding: 4px 10px; border-radius: 999px; color: #fff; font-size: .85rem; }
+.badge.on { background: var(--ok); }
+.badge.off { background: var(--off); }
+body[data-state="present"] #state { color: var(--ok); }
+body[data-state="absent"] #state { color: var(--warn); }
+body[data-state="no_device"] #state { color: var(--off); }
