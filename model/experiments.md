@@ -68,6 +68,16 @@ F1·P·R은 test set(float32, 88장 137개 얼굴) 값. Model testing에서 int8
 - 임계값 0.6이 F1 최고(0.5: 0.725, 0.7: 0.744, 0.8: 0.708). 오탐을 더 줄이려면 0.7~0.8(정밀도 0.82~0.89).
 - 남은 확인: 보드 `infer_ms`, 시연 카메라에서의 감지율·오탐률(팀원4 `model/testing/measure.py`).
 
+#### 데이터·모델 출처 (v19)
+- **데이터:** WIDER FACE (Yang et al., CVPR 2016, <http://shuoyang1213.me/WIDERFACE/>). 실제로 받은 곳은 Hugging Face 미러 [`CUHK-CSE/wider_face`](https://huggingface.co/datasets/CUHK-CSE/wider_face)이다. 파일은 `data/WIDER_train.zip`, `data/WIDER_val.zip`, `data/wider_face_split.zip`이고 2026-10-30 12:03~12:06에 받았다. 이 PC의 위치는 `C:\dev\ztm-data\wider\`(git 제외).
+- **분할:** 공식 분할을 그대로 쓴다. train 12,880장에서 학습용 정사각형 41,067장을 잘랐다(seed 2·3 두 벌). val 3,226장에서 검증용 5,105장을 잘랐다(seed 1). 공식 test는 정답이 공개되지 않아 쓰지 않았다.
+- **라이선스:** CC BY-NC-ND 4.0(비상업·출처 표시·변경물 배포 금지). 수업 프로젝트(비상업)에서 학습과 발표에 쓰는 것은 조건 안이라고 본다.
+  - 잘라낸 데이터(npz)와 원본 이미지는 git이나 공개 저장소에 올리지 않는다.
+  - 발표 자료에 출처(논문 인용)를 적는다.
+  - 학습한 모델을 외부에 공개 배포하는 것이 "변경물 배포"에 해당하는지는 해석이 갈린다. 그래서 v19 zip은 팀 안에서만 쓴다. (법률 판단이 아니라 라이선스 문구를 읽은 정리다.)
+- **모델 구조:** Keras로 직접 구성했다(`model/train/train_fomo.py`). Edge Impulse FOMO와 같은 형태로, MobileNetV2 α=0.1의 `block_6_expand_relu`까지 쓰고 그 뒤에 1×1 Conv 32(relu)와 1×1 Conv 2(softmax)를 붙였다. 입력은 64×64×1, 출력은 8×8×2이다.
+  - **사전학습 가중치는 쓰지 않았다**(`--no-pretrained`, 무작위 초기화). Keras에는 α=0.1의 ImageNet 가중치가 없다. ImageNet 가중치를 쓴 L1(α=0.35)은 탈락했다.
+
 ## 보드 실측 (10-30 14시, XIAO ESP32S3 + OV2640, 코어 3.3.12, 창2/팀원2)
 | 모델 | 엔진 | 빌드 | 크래시 | dsp / 추론 | 정면 50~80cm | 아주 가까운 얼굴 | 얼굴 없음 오탐 |
 |---|---|---|---|---|---|---|---|
