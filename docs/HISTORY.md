@@ -36,3 +36,11 @@
 - 시행착오: arena 64KB는 AllocateTensors 실패 → 128KB. 하네스 빌드 캐시가 헤더 변경을 못 잡아 옛 arena로 돈 적 있음 → obj 폴더 이름에 모델 설정 해시.
 - PR #3(팀원4 도구·로컬 학습 도구)은 사용자 요청으로 확인자 없이 병합.
 
+## 2026-10-30 v19 보드 실측·인수인계 (팀원1, 컴파일 세션)
+- 도구: Arduino IDE 내장 `arduino-cli`, 보드 XIAO ESP32S3 Sense(COM10), 코어 3.3.12, `PSRAM=opi`, 한글 경로 때문에 subst W:/V: 사용. 빌드는 `--jobs 2`(동시 4.6GB 학습과 겹치면 메모리 부족으로 시스템이 빌드를 중단함).
+- v17(공개 원본, EON): 코어 3.3.12·XIAO_ESP32S3에서 컴파일 통과(최소 스케치 Flash 346KB, RAM 63.7KB). 카메라 스케치로 업로드하면 `run_classifier` 안에서 `StoreProhibited` 반복 재부팅. 추론 직전까지 `heap_caps_check_integrity_all` 정상 → 카메라·스케치 버퍼는 원인 아님. 백트레이스: `tflite_learn_*_reset` → `ei_free` → `tlsf_free`(이미 깨진 힙). 같은 EON 라이브러리는 PC 하네스에서 5,105번 정상.
+- ESP-NN 끄기 시험은 **무효**: PowerShell이 `-D…` 인자를 매개변수 이름으로 해석해 `build.extra_flags`가 비어 있었음(`compile_commands.json`에 `ESP_NN=0` 없음). 환경변수 `EXTRA_FLAGS`로 고쳤으나 이후 v19가 돌아 재시험은 보류. 원인은 EON 경로일 가능성이 크다는 정도까지(v17·v19 모두 ESP-NN 켬, v19만 정상).
+- v19(L3, TFLite Micro, ESP-NN 켬): 빌드 Flash 694KB(20%)·RAM 40.7KB(12%), **크래시 없음**, `dsp 2ms`, `infer 50ms`, 카메라 포함 초당 약 6프레임. 50~80cm 정면에서 value 0.64~0.79, 박스 1~2개. 얼굴이 화면을 가득 채울 만큼 가까우면 143프레임 연속 0(캡처 모드로 확인: 카메라는 정상, 학습에 없는 크기).
+- 캡처 모드(`-DCAPTURE_MODE`): `FRAME 64 64 <hex>` 한 줄 = 한 프레임, hex 길이 8192. 첫 프레임은 워밍업으로 어두움(평균 54, 이후 약 140).
+- 시행착오: 빌드 폴더를 버전마다 새로 만들면 라이브러리를 처음부터 다시 컴파일해 10분 이상 걸림(스케치만 바꿀 땐 1분 안쪽).
+- 아직 안 한 것: v18 보드 실행, 얼굴 없음 오탐률, 옆모습·1~2m. 인수인계: `model/firmware-handoff.md`, 참고 스케치 `model/samples/ei_cam_test/`.
