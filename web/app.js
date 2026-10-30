@@ -99,11 +99,13 @@ function connect() {
       serverState = m.state;
       $("state").textContent = STATE_LABEL[m.state] || m.state;
       document.body.dataset.state = m.state;
+      if (m.state === "no_device") camPip.setFace("stale", "보드 신호 없음");
       const d = m.device || {};
       $("device").textContent = d.connected ? `${d.id} (fw ${d.fw || "?"}, ${d.model || "?"})` : "연결 안 됨";
       apply();
     } else if (m.type === "detect") {
       $("detect").textContent = `${m.face ? "얼굴" : "없음"} · 신뢰도 ${m.score.toFixed(2)} · 추론 ${m.infer_ms ?? "?"}ms · #${m.seq}`;
+      camPip.setFace(m.face ? "yes" : "no", `${m.face ? "Face Detected" : "Face Not Detected"} · ${m.score.toFixed(2)}`);
     } else if (m.type === "ping") {
       send({ type: "pong", t0: m.t0, t1: Date.now() });
     }
@@ -113,7 +115,11 @@ function connect() {
 function setConn(ok) {
   $("conn").textContent = ok ? "서버 연결됨" : "서버 연결 끊김";
   $("conn").className = "badge " + (ok ? "on" : "off");
-  if (!ok) { serverState = "no_device"; apply(); }  // 서버가 끊기면 안전하게 정지
+  if (!ok) {  // 서버가 끊기면 안전하게 정지
+    serverState = "no_device";
+    apply();
+    camPip.setFace("stale", "서버 연결 끊김");
+  }
 }
 
 connect();

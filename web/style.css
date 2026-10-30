@@ -55,3 +55,4 @@ h2 { font-size: .95rem; color: var(--muted); margin: 20px 0 6px; }
 body.pip { margin: 0; background: #000; }
 body.pip #cam { max-width: none; margin: 0; height: 100vh; border-radius: 0; }
 body.pip #cam video { height: 100%; object-fit: cover; }
+#cam-card { margin-top: 16px; }

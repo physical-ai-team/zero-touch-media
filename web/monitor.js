@@ -106,77 +106,13 @@ function drawTimeline(now) {
   ctx.stroke();
 }
 
-// 큰 표시와 웹캠 배지를 함께 바꾼다. 웹캠 박스는 PiP 창으로 옮겨질 수 있어 id 대신 변수로 잡아 둔다.
+// 큰 표시와 웹캠 배지(campip.js)를 함께 바꾼다.
 function setFace(kind, label, sub, badge) {
   $("face").dataset.face = kind;
   $("face-label").textContent = label;
   $("face-sub").textContent = sub;
-  cam.dataset.face = kind;
-  camBadge.textContent = badge;
+  camPip.setFace(kind, badge);
 }
-
-// ---------- PC 웹캠 + PiP ----------
-// Chrome·Edge: Document PiP로 웹캠+감지 배지를 항상 위 창에 띄운다. 그 밖의 브라우저: 영상만 PiP.
-// getUserMedia는 localhost 또는 https에서만 된다(다른 PC에서 http://IP 로 열면 웹캠 못 씀).
-
-const cam = $("cam");
-const camVideo = $("cam-video");
-const camBadge = $("cam-badge");
-let camStream = null;
-let pipWin = null;
-
-$("cam-on").onclick = async () => {
-  if (camStream) {
-    if (pipWin) pipWin.close();
-    camStream.getTracks().forEach((t) => t.stop());
-    camStream = null;
-    cam.hidden = true;
-    $("cam-on").textContent = "웹캠 켜기";
-    $("cam-pip").disabled = true;
-    return;
-  }
-  if (!navigator.mediaDevices) {
-    log("웹캠은 localhost(또는 https)에서만 열 수 있습니다", "warn");
-    return;
-  }
-  try {
-    camStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false });
-  } catch (e) {
-    log(`웹캠을 열지 못했습니다: ${e.name}`, "warn");
-    return;
-  }
-  camVideo.srcObject = camStream;
-  cam.hidden = false;
-  $("cam-on").textContent = "웹캠 끄기";
-  $("cam-pip").disabled = false;
-};
-
-$("cam-pip").onclick = async () => {
-  if (pipWin) { pipWin.close(); return; }
-  if (!("documentPictureInPicture" in window)) {
-    await camVideo.requestPictureInPicture().catch((e) => log(`PiP 실패: ${e.name}`, "warn"));
-    return;
-  }
-  pipWin = await documentPictureInPicture.requestWindow({ width: 360, height: 290 });
-  // PiP 창은 빈 문서라 스타일을 절대 주소로 다시 건다.
-  document.querySelectorAll('link[rel="stylesheet"]').forEach((l) => {
-    const link = pipWin.document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = l.href;
-    pipWin.document.head.append(link);
-  });
-  pipWin.document.title = "ZTMC 웹캠";
-  pipWin.document.body.className = "pip";
-  pipWin.document.body.append(cam);
-  camVideo.play();
-  $("cam-pip").textContent = "PiP 닫기";
-  pipWin.addEventListener("pagehide", () => {
-    $("cam-card").append(cam);
-    camVideo.play();
-    pipWin = null;
-    $("cam-pip").textContent = "PiP 창으로";
-  });
-};
 
 // ---------- 서버 WebSocket ----------
 
