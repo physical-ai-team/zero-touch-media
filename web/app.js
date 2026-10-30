@@ -14,11 +14,14 @@ let ws = null;
 
 window.onYouTubeIframeAPIReady = async () => {
   const cfg = await fetch("/api/config").then((r) => r.json()).catch(() => ({}));
-  const videoId = cfg.default_video_id || "jNQXAC9IVRw";
-  $("video-id").value = videoId;
+  // 마지막으로 불러온 영상(이 브라우저에만 저장) → 없으면 .env의 DEFAULT_VIDEO_ID
+  let saved = null;
+  try { saved = localStorage.getItem("ztmc.video"); } catch {}
+  const v = (saved && parseVideo(saved)) || { videoId: cfg.default_video_id || "jNQXAC9IVRw" };
+  $("video-id").value = saved && parseVideo(saved) ? saved : v.videoId;
   player = new YT.Player("player", {
-    videoId,
-    playerVars: { playsinline: 1, rel: 0 },
+    videoId: v.videoId,
+    playerVars: { playsinline: 1, rel: 0, start: v.startSeconds || 0 },
     events: {
       onReady: () => { playerReady = true; apply(); },
       onStateChange: onPlayerStateChange,
@@ -46,10 +49,33 @@ $("start").onclick = () => {
   apply();
 };
 
-$("load").onclick = () => {
-  const id = $("video-id").value.trim();
-  if (playerReady && id) { player.cueVideoById(id); apply(); }
-};
+// 유튜브 주소(watch?v=, youtu.be/, shorts/, embed/, live/) 또는 11자 영상 ID → {videoId, startSeconds}
+function parseVideo(text) {
+  const s = text.trim();
+  if (/^[\w-]{11}$/.test(s)) return { videoId: s };
+  let u;
+  try { u = new URL(s.includes("://") ? s : `https://${s}`); } catch { return null; }
+  const path = u.pathname.match(/^\/(?:shorts|embed|live|v)\/([\w-]{11})/);
+  const id = u.hostname.endsWith("youtu.be") ? u.pathname.slice(1, 12) : (u.searchParams.get("v") || (path && path[1]));
+  if (!id || !/^[\w-]{11}$/.test(id)) return null;
+  // t=90, t=90s, t=1m30s, t=1h2m3s
+  const t = (u.searchParams.get("t") || u.searchParams.get("start") || "").match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/);
+  const start = t ? (+t[1] || 0) * 3600 + (+t[2] || 0) * 60 + (+t[3] || 0) : 0;
+  return start ? { videoId: id, startSeconds: start } : { videoId: id };
+}
+
+function loadVideo() {
+  const v = parseVideo($("video-id").value);
+  if (!v) { $("video-msg").textContent = "유튜브 주소나 영상 ID를 알아볼 수 없습니다"; return; }
+  if (!playerReady) return;
+  player.cueVideoById(v);
+  $("video-msg").textContent = `불러옴: ${v.videoId}${v.startSeconds ? ` (${v.startSeconds}초부터)` : ""}`;
+  try { localStorage.setItem("ztmc.video", $("video-id").value.trim()); } catch {}
+  apply();
+}
+
+$("load").onclick = loadVideo;
+$("video-id").onkeydown = (e) => { if (e.key === "Enter") loadVideo(); };
 
 $("manual").onchange = () => {
   send({ type: "player", event: $("manual").checked ? "manual_on" : "manual_off", ts: Date.now() });

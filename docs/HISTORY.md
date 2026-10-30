@@ -48,3 +48,4 @@
 ## 2026-10-30 모니터 페이지 웹캠 PiP (팀원3)
 - 결정: 영상은 **PC 웹캠**(보드는 이미지를 안 보냄. 보드 영상은 프로토콜·펌웨어 변경이 필요해 보류), 창은 Document Picture-in-Picture(항상 위, 감지 배지 포함). 미지원 브라우저는 video PiP(영상만).
 - `web/monitor.*`만 변경. 서버가 새 파일을 내주는 것까지 확인, 브라우저 웹캠·PiP 동작은 수동 확인 필요.
+- 플레이어 페이지: 영상 ID 칸이 유튜브 주소(watch?v=, youtu.be, shorts, embed, live, `t=`)도 받음. Enter로 불러오기, 마지막 영상 localStorage 기억. 주소 해석 9가지 node로 확인.
