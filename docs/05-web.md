@@ -8,6 +8,12 @@
 - 판정·장치·최근 인식·플레이어 상태 표시, 영상 ID 바꾸기, 수동 모드
 - `ping`에 `pong` 응답, 플레이어 이벤트를 서버로 보고
 
+## 모니터 페이지 `monitor.html`
+- <http://localhost:8000/monitor.html> (플레이어 페이지 위 "모니터" 링크). 같은 `/ws/player`를 받아 **보여 주기만** 한다.
+- Face Detected / Face Not Detected / 신호 없음(`DEVICE_TIMEOUT_MS` 동안 detect 없음) 큰 표시, 신뢰도 막대(`MIN_SCORE` 표시), 서버 판정, 장치, 수신 Hz, 추론/DSP ms, 최근 30초 타임라인, 바뀔 때만 남는 기록.
+- detect는 서버가 `PLAYER_DETECT_HZ`로 줄여 보내므로 웹의 빈도는 "받은 것" 기준. 원본 전부를 보려면 터미널 모니터:
+  `python tools\monitor.py` (브로커 직접 구독, 서버 없이도 동작, seq 유실 수 표시, `--all`로 detect 전부 출력)
+
 ## 할 일 (예시)
 - 디자인, 상태를 크게 보여 주는 표시(재생 중/정지/장치 없음), 신뢰도 막대
 - 영상 목록·재생목록, 전체 화면
