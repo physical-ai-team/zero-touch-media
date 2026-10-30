@@ -3,6 +3,7 @@
     python tools/fake_esp32.py                 # 키보드로 조작
     python tools/fake_esp32.py --scenario      # 얼굴 5초 있음 / 5초 없음 반복
     python tools/fake_esp32.py --host 192.168.0.10
+    python tools/fake_esp32.py --frame-hz 0     # 카메라 영상(frame) 안 보냄
 
 키보드(입력 후 Enter):  f = 얼굴 있음   n = 얼굴 없음   l = 낮은 신뢰도(0.4)   x = 갑자기 끊김(LWT 시험)   q = 정상 종료
 """
@@ -13,9 +14,30 @@ import argparse
 import json
 import random
 import threading
+import io
 import time
 
 import paho.mqtt.client as mqtt
+
+try:
+    from PIL import Image, ImageDraw
+except ImportError:  # 영상 없이도 detect는 보낸다
+    Image = None
+
+
+def fake_frame(face: bool, seq: int) -> bytes:
+    """보드 카메라 대신 320x240 흑백 JPEG. 얼굴 있음이면 웃는 얼굴을 그린다."""
+    im = Image.new("L", (320, 240), 90)
+    d = ImageDraw.Draw(im)
+    if face:
+        d.ellipse((110, 50, 210, 180), fill=200)
+        d.ellipse((135, 90, 150, 105), fill=40)
+        d.ellipse((170, 90, 185, 105), fill=40)
+        d.arc((135, 110, 185, 155), 20, 160, fill=40, width=4)
+    d.text((8, 220), f"FAKE CAM #{seq}  {'FACE' if face else 'NO FACE'}", fill=255)
+    buf = io.BytesIO()
+    im.save(buf, "JPEG", quality=70)
+    return buf.getvalue()
 
 
 def main() -> None:
@@ -25,6 +47,7 @@ def main() -> None:
     ap.add_argument("--prefix", default="ztmc")
     ap.add_argument("--device", default="cam-1")
     ap.add_argument("--hz", type=float, default=5.0, help="detect 발행 빈도")
+    ap.add_argument("--frame-hz", type=float, default=2.0, help="카메라 영상(JPEG) 발행 빈도, 0이면 안 보냄")
     ap.add_argument("--scenario", action="store_true", help="키보드 대신 5초마다 얼굴 있음/없음 반복")
     a = ap.parse_args()
 
@@ -57,7 +80,19 @@ def main() -> None:
             client.publish(f"{base}/detect", json.dumps(msg), qos=0)
             time.sleep(1.0 / a.hz)
 
+    def frame_sender():
+        seq = 0
+        while state["run"]:
+            seq += 1
+            client.publish(f"{base}/frame", fake_frame(state["face"], seq), qos=0)
+            time.sleep(1.0 / a.frame_hz)
+
     threading.Thread(target=sender, daemon=True).start()
+    if a.frame_hz > 0:
+        if Image is None:
+            print("Pillow가 없어 카메라 영상은 안 보냄 (pip install -r requirements-dev.txt)")
+        else:
+            threading.Thread(target=frame_sender, daemon=True).start()
 
     def set_face(face: bool, score: float):
         state["face"], state["score"] = face, score
