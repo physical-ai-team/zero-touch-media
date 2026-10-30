@@ -54,7 +54,9 @@
 **팀원3 (브로커·서버·웹)**
 - [x] 얼굴 감지 신호 모니터: 터미널 `python tools\monitor.py`(브로커 직접 구독, 서버 없이도 됨), 웹 <http://localhost:8000/monitor.html>
 - [x] 모니터 페이지에 PC 웹캠 PiP 창(감지 배지 겹쳐 표시) 추가
-- [ ] 웹캠 PiP를 Chrome/Edge에서 직접 확인(자동 시험 못 함)
+- [x] PiP를 PC 웹캠 → **보드 카메라 영상**으로 교체: MQTT `ztmc/{id}/frame`(JPEG) → 서버 → WebSocket 바이너리 → 웹. 가짜 ESP32로 확인
+- [ ] `frame` 토픽 추가를 팀원1·2와 합의(`docs/03-protocol.md`), 팀원2에게 펌웨어 쪽 요청(같은 문서 frame 절에 방법)
+- [ ] PiP 창을 Chrome/Edge에서 직접 확인(자동 시험 못 함)
 - [ ] 실제 보드 신호를 `tools\monitor.py`로 확인(팀원2 `USE_FAKE_DETECT 1` 업로드 후)
 - [ ] 시연 PC Windows 방화벽 1883 인바운드 허용 — 관리자 PowerShell:
       `New-NetFirewallRule -DisplayName "Mosquitto 1883" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow`

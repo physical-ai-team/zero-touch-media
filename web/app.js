@@ -110,7 +110,9 @@ function connect() {
   ws = new WebSocket(`${proto}://${location.host}/ws/player`);
   ws.onopen = () => setConn(true);
   ws.onclose = () => { setConn(false); setTimeout(connect, 1000); };
+  ws.binaryType = "blob";
   ws.onmessage = (e) => {
+    if (typeof e.data !== "string") { camPip.setFrame(e.data); return; }  // 바이너리 = 보드 카메라 JPEG
     const m = JSON.parse(e.data);
     if (m.type === "state") {
       serverState = m.state;

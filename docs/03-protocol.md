@@ -12,6 +12,7 @@
 | `ztmc/{device_id}/status` | 문자열 `online` / `offline`. 접속 직후 `online`, **LWT로 `offline` 등록** | 1 | 예 |
 | `ztmc/{device_id}/hello` | 장치 정보 JSON | 1 | 예 |
 | `ztmc/{device_id}/detect` | 추론 결과 JSON, 추론할 때마다 | 0 | 아니오 |
+| `ztmc/{device_id}/frame` | 카메라 화면 **JPEG 바이너리**(JSON 아님), 초당 1~2장 — **추가 제안, 세 명 합의 대기** | 0 | 아니오 |
 
 ```jsonc
 // hello
@@ -20,6 +21,10 @@
 {"device_id": "cam-1", "seq": 12, "face": true, "score": 0.83, "count": 1, "dsp_ms": 8, "infer_ms": 45}
 ```
 - `face`: `threshold` 이상인 얼굴이 하나라도 있으면 true. `score`: 가장 높은 값(없으면 0). `count`: 기준 이상 얼굴 수.
+- `frame`: 화면 확인용(웹 "보드 카메라"·PiP 창). **판정에는 쓰지 않는다.** 보내지 않아도 나머지는 그대로 동작한다.
+  - 권장: 추론에 쓰는 그 프레임(320×240 흑백)을 `frame2jpg(fb, 60, &jpg, &len)`(`img_converters.h`)로 JPEG 변환, 수 KB.
+  - PubSubClient 버퍼(512)보다 크므로 나눠 보낸다: `mqtt.beginPublish(topicFrame, len, false); mqtt.write(jpg, len); mqtt.endPublish(); free(jpg);`
+  - 빈도는 `config.h`의 값으로(예 `FRAME_INTERVAL_MS 500`). Wi-Fi가 약하면 늘리거나 끈다. 서버는 `FRAME_MAX_BYTES`(기본 100000)보다 크거나 JPEG가 아니면 버린다.
 - keepalive **5초** → 갑자기 끊기면 약 7.5초 뒤 브로커가 `offline` 발행. 서버는 그보다 먼저 `DEVICE_TIMEOUT_MS`(3초) 동안 detect가 없으면 장치 없음으로 본다.
 
 ## MQTT — 서버 → 브로커
@@ -35,6 +40,7 @@
 ```
 - `state`: `present`(재생) | `absent`(정지) | `no_device`(정지 + 끊김 표시). 접속 직후 1번, 바뀔 때마다.
 - `detect`: 화면 표시·측정용. `PLAYER_DETECT_HZ`(기본 10)로 줄여 보낸다. 판정에는 모든 detect를 쓴다.
+- **바이너리 메시지** = 보드 카메라 JPEG 한 장(MQTT `frame` 그대로). `PLAYER_FRAME_HZ`(기본 5)로 줄여 보낸다. 브라우저는 `ws.binaryType = "blob"`으로 받아 텍스트(JSON)와 구분한다.
 
 ## WebSocket — 브라우저 → 서버
 ```jsonc

@@ -62,3 +62,15 @@ def test_bad_payload_is_counted_not_crashing():
         push(client, engine, "ztmc/cam-1/detect", b"not json")
         push(client, engine, "ztmc/cam-1/detect", {"device_id": "cam-1"})  # face 없음
         assert client.get("/health").json()["stats"]["bad"] == 2
+
+
+def test_frame_is_forwarded_as_binary():
+    client, engine = make_client()
+    jpeg = b"\xff\xd8" + b"\x00" * 100 + b"\xff\xd9"
+    with client, client.websocket_connect("/ws/player") as ws:
+        json.loads(ws.receive_text())  # 접속 직후 state
+        push(client, engine, "ztmc/cam-1/frame", b"not a jpeg")  # 버림
+        push(client, engine, "ztmc/cam-1/frame", jpeg)
+        assert ws.receive_bytes() == jpeg
+        assert engine.stats["frame"] == 2 and engine.stats["bad"] == 1
+        assert engine.tracker.state == "no_device"  # 영상은 판정에 안 쓴다

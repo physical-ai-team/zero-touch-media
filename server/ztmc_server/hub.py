@@ -29,13 +29,17 @@ class PlayerHub:
             self._clients.discard(ws)
         log.info("player disconnected (total %d)", self.count)
 
-    async def broadcast(self, text: str) -> None:
+    async def broadcast(self, data: str | bytes) -> None:
+        """str은 텍스트(JSON), bytes는 바이너리(보드 카메라 JPEG) 메시지로 보낸다."""
         async with self._lock:
             clients = list(self._clients)
         dead = []
         for ws in clients:
             try:
-                await ws.send_text(text)
+                if isinstance(data, bytes):
+                    await ws.send_bytes(data)
+                else:
+                    await ws.send_text(data)
             except Exception:  # 끊긴 연결은 조용히 정리
                 dead.append(ws)
         for ws in dead:

@@ -1,6 +1,7 @@
 """서버 진입점.  실행:  python -m ztmc_server   (server/ 폴더에서, 또는 README 참고)
 
 흐름: MQTT {prefix}/{device}/{status|hello|detect} → Engine(판정) → /ws/player 브라우저 + MQTT {prefix}/state
+     MQTT {prefix}/{device}/frame(JPEG) → /ws/player 바이너리 메시지 (판정에는 안 씀)
 """
 
 from __future__ import annotations
@@ -56,7 +57,8 @@ class Engine:
         self.device = DeviceInfo()
         self.mqtt: Optional[MqttBridge] = None
         self._last_detect_sent = 0.0
-        self.stats = {"detect": 0, "bad": 0, "state_changes": 0}
+        self._last_frame_sent = 0.0
+        self.stats = {"detect": 0, "frame": 0, "bad": 0, "state_changes": 0}
 
     # ---- 출력 ----
 
@@ -82,6 +84,9 @@ class Engine:
         if parsed is None:
             return
         device_id, kind = parsed
+        if kind == "frame":
+            await self._forward_frame(payload, recv)
+            return
         changes: list = []
         try:
             if kind == "status":
@@ -113,6 +118,18 @@ class Engine:
         self._last_detect_sent = recv
         out = DetectOut(**d.model_dump(), trace=Trace(gw_recv=recv, gw_sent=now_ms()))
         await self.hub.broadcast(out.model_dump_json())
+
+    async def _forward_frame(self, jpeg: bytes, recv: float) -> None:
+        # 보드 카메라 화면. 화면 표시용이라 PLAYER_FRAME_HZ로 줄여 그대로 바이너리로 보낸다.
+        self.stats["frame"] += 1
+        if not jpeg.startswith(b"\xff\xd8") or len(jpeg) > self.s.frame_max_bytes:  # JPEG 시작 표시
+            self.stats["bad"] += 1
+            log.warning("bad frame (%d bytes)", len(jpeg))
+            return
+        if self.s.player_frame_hz <= 0 or recv - self._last_frame_sent < 1000.0 / self.s.player_frame_hz:
+            return
+        self._last_frame_sent = recv
+        await self.hub.broadcast(jpeg)
 
     async def tick(self) -> None:
         for state in self.tracker.tick(now_ms()):
