@@ -50,3 +50,11 @@
 - `web/monitor.*`만 변경. 서버가 새 파일을 내주는 것까지 확인, 브라우저 웹캠·PiP 동작은 수동 확인 필요.
 - 플레이어 페이지: 영상 ID 칸이 유튜브 주소(watch?v=, youtu.be, shorts, embed, live, `t=`)도 받음. Enter로 불러오기, 마지막 영상 localStorage 기억. 주소 해석 9가지 node로 확인.
 - 웹캠 PiP를 `web/campip.js`로 떼어 플레이어 페이지에도 추가. 플레이어에서는 detect로 배지, no_device·서버 끊김이면 '신호 없음'. 헤드리스 Edge/Chrome으로 두 페이지 스크립트 실행 확인(웹캠·PiP 자체는 수동 확인 필요).
+- 영상 불러오기 안내: 유튜브 onError(임베드 막힘 101/150, 비공개 100 등) 문구 표시, 불러온 뒤 바로 재생 안 되는 이유(시작 안 누름·수동 모드·얼굴 없음) 표시, 플레이어 준비 전 클릭 안내.
+
+## 2026-10-30 PiP 영상을 보드 카메라로 (팀원3)
+- 결정(사용자): PC 웹캠 대신 ESP32 카메라. 전송은 MQTT JPEG(보드 MJPEG HTTP 대신: 연결 하나, 터널·https에서도 보임), 겹쳐 표시는 배지만, 웹캠 기능은 뺌.
+- 프로토콜 추가 제안: `ztmc/{id}/frame` JPEG 바이너리 QoS0 → WebSocket 바이너리 메시지. 세 명 합의 대기(문서에 표시). 펌웨어는 아직 안 보냄 → 팀원2 요청.
+- 서버: `frame`은 판정에 안 쓰고 `PLAYER_FRAME_HZ`(5)로 줄여 전달, JPEG 아님·`FRAME_MAX_BYTES` 초과는 버림. `.env.example`에 두 키 추가. 시험 1개 추가(15 통과).
+- 가짜 ESP32: Pillow로 320×240 흑백 가짜 화면(얼굴 있음이면 웃는 얼굴) 2fps, `--frame-hz 0`으로 끔. `requirements-dev.txt`에 pillow 추가. 터미널 모니터에 영상 fps·크기 표시.
+- 시험: 따로 띄운 서버(8001, 접두어 ztmctest) + 가짜 ESP32: 서버 frame 9 / bad 0, 플레이어 페이지가 blob JPEG 받음, monitor.py "영상 2.0fps".

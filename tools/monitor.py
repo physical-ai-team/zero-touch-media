@@ -37,6 +37,7 @@ class Device:
         self.times: deque[float] = deque(maxlen=50)
         self.count = 0
         self.lost = 0               # seq 건너뜀으로 추정한 유실 수
+        self.frames: deque[tuple[float, int]] = deque(maxlen=50)  # (받은 시각, JPEG 바이트)
 
 
 class Monitor:
@@ -86,6 +87,8 @@ class Monitor:
                 elif kind == "hello":
                     dev.hello = self.parse(text, msg.topic) or {}
                     self.log(f"[{parts[1]}] hello {dev.hello}")
+                elif kind == "frame":
+                    dev.frames.append((time.monotonic(), len(msg.payload)))
                 elif kind == "detect":
                     d = self.parse(text, msg.topic)
                     if d is not None:
@@ -146,10 +149,12 @@ class Monitor:
                 continue
             recent = [t for t in dev.times if now - t <= 2.0]
             hz = len(recent) / 2.0
+            frames = [b for t, b in dev.frames if now - t <= 2.0]
+            video = f"영상 {len(frames) / 2.0:.1f}fps {sum(frames) // max(1, len(frames)) // 1024}KB" if frames else "영상 없음"
             d = dev.last
             parts.append(f"{dev_id}: {self.face_label(bool(d.get('face')))} "
                          f"score {d.get('score', 0):.2f} · {hz:.1f}Hz · infer {d.get('infer_ms', '?')}ms "
-                         f"· 받음 {dev.count} 유실 {dev.lost}")
+                         f"· 받음 {dev.count} 유실 {dev.lost} · {video}")
         return " | ".join(parts) + f" | 판정 {self.server_state}"
 
     def run(self) -> None:

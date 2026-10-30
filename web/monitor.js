@@ -106,7 +106,7 @@ function drawTimeline(now) {
   ctx.stroke();
 }
 
-// 큰 표시와 웹캠 배지(campip.js)를 함께 바꾼다.
+// 큰 표시와 보드 카메라 배지(campip.js)를 함께 바꾼다.
 function setFace(kind, label, sub, badge) {
   $("face").dataset.face = kind;
   $("face-label").textContent = label;
@@ -121,7 +121,9 @@ function connect() {
   ws = new WebSocket(`${proto}://${location.host}/ws/player`);
   ws.onopen = () => setConn(true);
   ws.onclose = () => { setConn(false); setTimeout(connect, 1000); };
+  ws.binaryType = "blob";
   ws.onmessage = (e) => {
+    if (typeof e.data !== "string") { camPip.setFrame(e.data); return; }  // 바이너리 = 보드 카메라 JPEG
     const m = JSON.parse(e.data);
     if (m.type === "detect") onDetect(m);
     else if (m.type === "state") onState(m);

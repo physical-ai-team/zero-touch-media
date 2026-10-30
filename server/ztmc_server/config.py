@@ -30,6 +30,8 @@ class Settings:
     device_timeout_ms: int = field(default_factory=lambda: int(_env("DEVICE_TIMEOUT_MS", "3000")))
 
     player_detect_hz: float = field(default_factory=lambda: float(_env("PLAYER_DETECT_HZ", "10")))
+    player_frame_hz: float = field(default_factory=lambda: float(_env("PLAYER_FRAME_HZ", "5")))
+    frame_max_bytes: int = field(default_factory=lambda: int(_env("FRAME_MAX_BYTES", "100000")))
     clock_ping_interval_sec: float = field(
         default_factory=lambda: float(_env("CLOCK_PING_INTERVAL_SEC", "2"))
     )
