@@ -4,6 +4,7 @@
 보드 전용 가속(ESP-NN, CMSIS-NN)은 끄고 일반 C 커널로 돈다 — 정확도 비교용, 속도는 상대값만.
 """
 import argparse
+import hashlib
 import os
 import subprocess
 import sys
@@ -23,7 +24,13 @@ def main():
     ap.add_argument('--gxx', default='g++'); ap.add_argument('-j', type=int, default=8)
     a = ap.parse_args()
     src = os.path.join(os.path.abspath(a.lib), 'src')
-    obj = os.path.join(os.path.dirname(os.path.abspath(a.exe)), 'obj_' + os.path.basename(a.exe).replace('.exe', ''))
+    # 모델 설정(헤더)이 바뀌면 SDK까지 다시 컴파일해야 하므로 obj 폴더 이름에 설정 해시를 넣는다
+    h = hashlib.sha1()
+    for d in ('model-parameters', 'tflite-model'):
+        for f in sorted(os.listdir(os.path.join(src, d))):
+            h.update(open(os.path.join(src, d, f), 'rb').read())
+    obj = os.path.join(os.path.dirname(os.path.abspath(a.exe)),
+                       'obj_' + os.path.basename(a.exe).replace('.exe', '') + '_' + h.hexdigest()[:8])
     os.makedirs(obj, exist_ok=True)
     files = []
     for root, _, fs in os.walk(src):

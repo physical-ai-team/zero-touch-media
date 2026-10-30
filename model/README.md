@@ -16,8 +16,11 @@
 |---|---|---|---|---|---|---|---|---|---|
 | 공개 원본 (zip v17) | [public/96468](https://studio.edgeimpulse.com/public/96468/latest) → 복제 [1152773](https://studio.edgeimpulse.com/studio/1152773) impulse 1 | 96×96 흑백 | FOMO MNv2 0.1 | 0.69 | 240K | 63.6K | 728 | | 10-30 |
 | 우리 학습 v1 (zip v18, E3) | [1152773](https://studio.edgeimpulse.com/studio/1152773) impulse 5 | **64×64** 흑백 | FOMO MNv2 0.1, LR 0.001, 증강 | **0.82** | **69K** | 68.8K | **280** | | 10-30 |
+| 우리 학습 v2 (zip v19, L3, **로컬**) | `model/train/` (WIDER FACE, EI 학습 시간 소진으로 로컬) | 64×64 흑백 | FOMO MNv2 0.1(처음부터), 얼굴 가중치 10, 임계값 0.6, TFLite Micro | WIDER 검증 **0.748** (같은 기준 v18 0.642) | arena 128K | 모델 41K | PC 4.4ms (v18 9.9ms) | | 10-30 |
 
 zip 위치(이 PC): `C:\dev\ei-zips\` — git에 올리지 않는다.
+
+v1(E3)과 v2(L3)의 F1은 기준이 다르다: v1 0.82는 EI 테스트셋(FFHQ 88장), v2 0.748은 WIDER 검증 5,105장(같은 기준에서 v1은 0.642). 둘 다 PC 하네스로 EI 라이브러리를 통째로 돌린 값은 WIDER 쪽.
 
 ## 지킬 것
 - 라벨 이름은 `face` 로 통일(펌웨어가 이 라벨로 센다). 바꾸면 팀원2와 맞춘다.

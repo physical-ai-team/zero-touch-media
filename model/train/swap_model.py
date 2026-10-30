@@ -26,6 +26,7 @@ def main():
     ap.add_argument('lib'); ap.add_argument('tflite'); ap.add_argument('out_zip')
     ap.add_argument('--arena', type=int, default=160 * 1024)
     ap.add_argument('--tag', default='local')
+    ap.add_argument('--threshold', type=float, default=None, help='FOMO 판정 임계값(기본: 원본 그대로)')
     a = ap.parse_args()
     data = open(a.tflite, 'rb').read()
 
@@ -59,12 +60,16 @@ def main():
                            f'    .arena_size = {a.arena}\n}};'), t, flags=re.S)
     t = t.replace('.compiled = 1,', '.compiled = 0,')
     t = re.sub(r'\.impulse_name = "[^"]*"', f'.impulse_name = "{a.tag}"', t)
+    if a.threshold is not None:
+        t = re.sub(r'(ei_fill_result_fomo_i8_config_\w+ = \{\s*\.threshold = )[\d.]+', rf'\g<1>{a.threshold}', t)
     open(mv, 'w', encoding='utf-8').write(t)
 
     d = open(md, encoding='utf-8').read()
     d = re.sub(r'#define EI_CLASSIFIER_COMPILED\s+1', '#define EI_CLASSIFIER_COMPILED                      0', d)
     d = re.sub(r'#define EI_CLASSIFIER_TFLITE_LARGEST_ARENA_SIZE\s+\d+',
                f'#define EI_CLASSIFIER_TFLITE_LARGEST_ARENA_SIZE     {a.arena}', d)
+    if a.threshold is not None:
+        d = re.sub(r'(#define EI_CLASSIFIER_OBJECT_DETECTION_THRESHOLD\s+)[\d.]+', rf'\g<1>{a.threshold}', d)
     open(md, 'w', encoding='utf-8').write(d)
 
     with zipfile.ZipFile(a.out_zip, 'w', zipfile.ZIP_DEFLATED) as z:
