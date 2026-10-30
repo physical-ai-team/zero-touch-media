@@ -5,13 +5,13 @@
 ## 뼈대에 있는 것
 - 유튜브 IFrame API 플레이어, "시작" 버튼(브라우저 자동재생 정책 때문에 첫 클릭 필요)
 - `state`에 따라 `playVideo()` / `pauseVideo()`. 서버 연결이 끊기면 정지
-- 판정·장치·최근 인식·플레이어 상태 표시, 영상 ID 바꾸기, 수동 모드
+- 판정·장치·최근 인식·플레이어 상태 표시, 영상 바꾸기(유튜브 주소 붙여넣기 또는 영상 ID, `t=` 시작 시각 반영, 마지막 영상은 브라우저에 기억), 수동 모드
 - `ping`에 `pong` 응답, 플레이어 이벤트를 서버로 보고
 
 ## 모니터 페이지 `monitor.html`
 - <http://localhost:8000/monitor.html> (플레이어 페이지 위 "모니터" 링크). 같은 `/ws/player`를 받아 **보여 주기만** 한다.
 - Face Detected / Face Not Detected / 신호 없음(`DEVICE_TIMEOUT_MS` 동안 detect 없음) 큰 표시, 신뢰도 막대(`MIN_SCORE` 표시), 서버 판정, 장치, 수신 Hz, 추론/DSP ms, 최근 30초 타임라인, 바뀔 때만 남는 기록.
-- **웹캠 PiP**: "웹캠 켜기" → "PiP 창으로". PC 웹캠 영상 + 감지 배지(테두리 색)를 항상 위 창에 띄운다(Chrome·Edge의 Document PiP, 그 밖의 브라우저는 영상만). 유튜브를 보면서도 보인다. PC 웹캠은 보드 카메라와 각도가 다르고, 배지는 **보드의** 감지 결과다. 웹캠은 `localhost`/https에서만 열린다.
+- **웹캠 PiP** (플레이어·모니터 두 페이지 모두, 코드는 `web/campip.js` 공용): "웹캠 켜기" → "PiP 창으로". PC 웹캠 영상 + 감지 배지(테두리 색)를 항상 위 창에 띄운다(Chrome·Edge의 Document PiP, 그 밖의 브라우저는 영상만). 유튜브를 보면서도 보인다. PC 웹캠은 보드 카메라와 각도가 다르고, 배지는 **보드의** 감지 결과다. 웹캠은 `localhost`/https에서만 열린다.
 - detect는 서버가 `PLAYER_DETECT_HZ`로 줄여 보내므로 웹의 빈도는 "받은 것" 기준. 원본 전부를 보려면 터미널 모니터:
   `python tools\monitor.py` (브로커 직접 구독, 서버 없이도 동작, seq 유실 수 표시, `--all`로 detect 전부 출력)
 

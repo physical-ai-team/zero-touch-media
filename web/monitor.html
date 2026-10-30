@@ -22,7 +22,7 @@
     <section id="cam-card">
       <div class="row">
         <h2>내 얼굴 (PC 웹캠)</h2>
-        <div><button id="cam-on" type="button">웹캠 켜기</button> <button id="cam-pip" type="button" disabled>PiP 창으로</button></div>
+        <div><button id="cam-on" type="button">웹캠 켜기</button> <button id="cam-pip" type="button" disabled>PiP 창으로</button> <span id="cam-msg"></span></div>
       </div>
       <!-- PC 웹캠은 보드 카메라와 위치·각도가 다르다. 감지 결과는 보드 기준. -->
       <div id="cam" data-face="none" hidden>
@@ -55,6 +55,7 @@
     </section>
   </main>
 
+  <script src="campip.js"></script>
   <script src="monitor.js"></script>
 </body>
 </html>

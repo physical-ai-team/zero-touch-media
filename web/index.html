@@ -27,13 +27,27 @@
     </section>
 
     <section id="controls">
-      <label>영상 ID <input id="video-id" size="14"></label>
+      <label>유튜브 주소 또는 영상 ID <input id="video-id" size="40" placeholder="https://www.youtube.com/watch?v=..."></label>
       <button id="load" type="button">불러오기</button>
+      <span id="video-msg"></span>
       <label><input id="manual" type="checkbox"> 수동 모드 (서버 판정 무시)</label>
+    </section>
+
+    <section id="cam-card">
+      <div class="row">
+        <h2>내 얼굴 (PC 웹캠)</h2>
+        <div><button id="cam-on" type="button">웹캠 켜기</button> <button id="cam-pip" type="button" disabled>PiP 창으로</button> <span id="cam-msg"></span></div>
+      </div>
+      <!-- PC 웹캠은 보드 카메라와 위치·각도가 다르다. 감지 결과는 보드 기준. -->
+      <div id="cam" data-face="none" hidden>
+        <video id="cam-video" autoplay muted playsinline></video>
+        <span id="cam-badge">신호 기다리는 중</span>
+      </div>
     </section>
   </main>
 
   <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="campip.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
