@@ -19,6 +19,7 @@
 ## 현재 상태 (2026-10-30)
 - 뼈대 완료: 판정 서버(MQTT 구독 → presence 상태기계 → WebSocket·`ztmc/state`), 가짜 ESP32, 최소 유튜브 페이지, 펌웨어 빈 스케치(Wi-Fi + MQTT + 가짜 detect), 문서 전부.
 - 확인함: pytest 14개 통과. Mosquitto 2.1.2 + 서버 + 가짜 ESP32로 absent → present → (얼굴 없음 1.5초) absent → (강제 종료) no_device(LWT) 확인. 펌웨어 컴파일 통과(XIAO_ESP32S3, 플래시 25%).
+- 모니터 추가(팀원3): `tools/monitor.py`(터미널), `web/monitor.html`(대시보드). 가짜 ESP32로 확인함.
 - 확인 못 함: 브라우저에서 유튜브 실제 재생/정지, 실제 보드 업로드·MQTT 접속, Edge Impulse 모델.
 - 역할: 팀원1 박민성(모델), 팀원2(펌웨어), 팀원3(브로커·서버·웹), 팀원4(시연 데이터·실제 정확도 측정, 10-30 합류) — 팀원2·3·4 이름은 정해지면 `CLAUDE.md`·`docs/07-team.md`에 적는다.
 - 보드: ESP32-S3, PSRAM 8MB, 플래시 8MB(esptool 확인). XIAO ESP32S3 Sense로 추정, 정확한 보드명 미확인.
@@ -50,6 +51,8 @@
 - [ ] `run_inference()` TODO 채우기 → `USE_FAKE_DETECT 0`, `infer_ms`·`dsp_ms` 실제 값
 
 **팀원3 (브로커·서버·웹)**
+- [x] 얼굴 감지 신호 모니터: 터미널 `python tools\monitor.py`(브로커 직접 구독, 서버 없이도 됨), 웹 <http://localhost:8000/monitor.html>
+- [ ] 실제 보드 신호를 `tools\monitor.py`로 확인(팀원2 `USE_FAKE_DETECT 1` 업로드 후)
 - [ ] 시연 PC Windows 방화벽 1883 인바운드 허용 — 관리자 PowerShell:
       `New-NetFirewallRule -DisplayName "Mosquitto 1883" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow`
 - [ ] 브라우저에서 유튜브 재생/정지 실제 확인, 웹 페이지 다듬기(`docs/05-web.md`)
