@@ -12,7 +12,7 @@
 1. 저장소: `github.com/physical-ai-team/zero-touch-media` → `C:\dev\zero-touch-media` 처럼 **영문 경로**에 clone.
    이미 있으면 `git fetch --all --prune` → `git switch main` → `git pull --ff-only` → 자기 브랜치에 `git merge origin/main`.
 2. 자기 역할 확인: `CLAUDE.md` 2절(담당 폴더). 작업 브랜치는 `feat/<담당>-<내용>`, `main` 직접 push 금지 → PR.
-3. 역할별 첫 문서: 팀원1 `model/README.md` · 팀원2 `docs/04-firmware.md` · 팀원3 `docs/05-web.md` + `docs/02-architecture.md`. 공통으로 `docs/03-protocol.md`.
+3. 역할별 첫 문서: 팀원1 `model/README.md` · 팀원2 `docs/04-firmware.md` · 팀원3 `docs/05-web.md` + `docs/02-architecture.md` · 팀원4 `model/testing/README.md`. 공통으로 `docs/03-protocol.md`.
 4. 환경(서버·웹·가짜 ESP32를 돌릴 사람): Miniforge + `conda env create -f environment.yml`(환경 `ztmc`) + Mosquitto(`winget install EclipseFoundation.Mosquitto`) + `copy .env.example .env`. 실행 명령은 `CLAUDE.md` 4절.
 5. 보드 없이 전체 확인: 브로커 → 서버 → `python tools\fake_esp32.py` → <http://localhost:8000> "시작" → `f`/`n`/`x`.
 
@@ -20,16 +20,24 @@
 - 뼈대 완료: 판정 서버(MQTT 구독 → presence 상태기계 → WebSocket·`ztmc/state`), 가짜 ESP32, 최소 유튜브 페이지, 펌웨어 빈 스케치(Wi-Fi + MQTT + 가짜 detect), 문서 전부.
 - 확인함: pytest 14개 통과. Mosquitto 2.1.2 + 서버 + 가짜 ESP32로 absent → present → (얼굴 없음 1.5초) absent → (강제 종료) no_device(LWT) 확인. 펌웨어 컴파일 통과(XIAO_ESP32S3, 플래시 25%).
 - 확인 못 함: 브라우저에서 유튜브 실제 재생/정지, 실제 보드 업로드·MQTT 접속, Edge Impulse 모델.
-- 역할: 팀원1 박민성(모델), 팀원2(펌웨어), 팀원3(브로커·서버·웹) — 팀원2·3 이름은 정해지면 `CLAUDE.md`·`docs/07-team.md`에 적는다.
+- 역할: 팀원1 박민성(모델), 팀원2(펌웨어), 팀원3(브로커·서버·웹), 팀원4(시연 데이터·실제 정확도 측정, 10-30 합류) — 팀원2·3·4 이름은 정해지면 `CLAUDE.md`·`docs/07-team.md`에 적는다.
 - 보드: ESP32-S3, PSRAM 8MB, 플래시 8MB(esptool 확인). XIAO ESP32S3 Sense로 추정, 정확한 보드명 미확인.
 - 실제 보드 확인(팀원2): `USE_FAKE_DETECT 1` 업로드 → 폰 핫스팟 Wi-Fi → MQTT → 서버 → 웹 유튜브 재생/정지까지 동작. 보드 Wi-Fi 수신이 약함(공유기 앞 -65 dBm, 자리 -92 dBm) → 안테나 점검 전까지 핫스팟을 보드 가까이.
 - 설계 근거: `docs/superpowers/specs/2026-10-30-skeleton-design.md`, `docs/decisions.md`.
 
 ## 남은 일
 **팀원1 박민성 (모델)**
-- [ ] Edge Impulse 공개 Face detection 프로젝트 고르기 → Clone → 공개 원본 그대로 Arduino library zip 받아 **팀원2에게 먼저 전달**
-- [ ] 학습·최적화(96×96 그레이스케일 FOMO 권장, 라벨 `face`) → 우리 모델 zip 전달
-- [ ] `model/README.md` 기록 표 채우기(정확도·RAM·Flash·보드 추론 ms, 공개 원본 vs 우리 모델)
+- [x] 공개 원본(public/96468) 복제 → Arduino library v17 zip (10-30)
+- [x] 비교 실험 6개 → **E3 64×64 흑백 채택**(test F1 0.69→0.82, 추정 728→280ms) → v18 zip. 기록 `model/experiments.md`, zip `C:\dev\ei-zips\`
+- [ ] 팀원2에게 v17·v18 zip 전달(이 PC의 컴파일 세션에는 전달함), 보드 실측 `infer_ms`를 받아 `model/README.md` 표 채우기
+- [ ] (시간 남으면) 시연 장소·카메라로 찍은 얼굴/배경 사진을 추가 학습 → 오탐 줄이기 (사진은 팀원4가 모아 줌)
+- [ ] 로컬 학습(Edge Impulse 무료 학습 시간 소진 → `model/train/`, WIDER FACE) 결과가 E3보다 나으면 새 zip(`swap_model.py`, TFLite Micro) 전달. 비교 기준: WIDER 검증 5,105장에서 E3 F1 0.642(PC 하네스 `model/train/pc_harness/`)
+
+**팀원4 (시연 데이터·실제 정확도 측정)** — 시작 문서 `model/testing/README.md`
+- [ ] 환경 준비(`conda` 환경 `ztmc` + `pip install -r model/testing/requirements.txt` + Mosquitto)
+- [ ] 보드가 실제 추론으로 돌면 `python model/testing/measure.py --tag v18` → 상황 11개 감지율·오탐률 표 커밋(`model/testing/results/`)
+- [ ] 캡처 모드 펌웨어로 `model/testing/capture.py` → 얼굴 200장+·배경 100장+ 모아 팀원1에게 전달(git 금지). 보드 전이면 휴대폰으로 시연 자리 사진(차선책)
+- [ ] 새 모델이 오면 같은 조건으로 다시 측정해 버전 비교
 
 **팀원2 (펌웨어)**
 - [ ] 보드명 확인 후 `docs/04-firmware.md` 보드 줄 고치기
