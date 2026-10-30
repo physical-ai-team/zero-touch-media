@@ -19,6 +19,7 @@
 ## 현재 상태 (2026-10-30)
 - 뼈대 완료: 판정 서버(MQTT 구독 → presence 상태기계 → WebSocket·`ztmc/state`), 가짜 ESP32, 최소 유튜브 페이지, 펌웨어 빈 스케치(Wi-Fi + MQTT + 가짜 detect), 문서 전부.
 - 확인함: pytest 14개 통과. Mosquitto 2.1.2 + 서버 + 가짜 ESP32로 absent → present → (얼굴 없음 1.5초) absent → (강제 종료) no_device(LWT) 확인. 펌웨어 컴파일 통과(XIAO_ESP32S3, 플래시 25%).
+- 모니터 추가(팀원3): `tools/monitor.py`(터미널), `web/monitor.html`(대시보드). 가짜 ESP32로 확인함.
 - 확인 못 함: 브라우저에서 유튜브 실제 재생/정지, 실제 보드 업로드·MQTT 접속, Edge Impulse 모델.
 - 역할: 팀원1 박민성(모델), 팀원2(펌웨어), 팀원3(브로커·서버·웹), 팀원4(시연 데이터·실제 정확도 측정, 10-30 합류) — 팀원2·3·4 이름은 정해지면 `CLAUDE.md`·`docs/07-team.md`에 적는다.
 - 보드: ESP32-S3, PSRAM 8MB, 플래시 8MB(esptool 확인). XIAO ESP32S3 Sense로 추정, 정확한 보드명 미확인.
@@ -32,8 +33,10 @@
 - [ ] 팀원2에게 v17·v18 zip 전달(이 PC의 컴파일 세션에는 전달함), 보드 실측 `infer_ms`를 받아 `model/README.md` 표 채우기
 - [ ] (시간 남으면) 시연 장소·카메라로 찍은 얼굴/배경 사진을 추가 학습 → 오탐 줄이기 (사진은 팀원4가 모아 줌)
 - [x] 로컬 학습 L3 → **v19 zip**(WIDER 검증 F1 0.748 vs v18 0.642, PC 추론 절반, TFLite Micro). 기록 `model/experiments.md`, zip `C:\dev\ei-zips\` → 창2(펌웨어 세션)에 전달
-- [x] v19 보드 실측: 크래시 없음, **infer 50ms·dsp 2ms**, 50~80cm 정면에서 value 0.64~0.79(너무 가까우면 못 잡음). v17(EON)은 보드 크래시 → **TFLite Micro 방식 v19 사용**. 인수인계 `model/firmware-handoff.md`
+- [x] v19 보드 실측: 크래시 없음(v17 EON은 크래시), 추론 50ms·dsp 2ms, 정면 50~80cm 감지. **v19 유지** (`model/experiments.md` 보드 실측 절). 펌웨어 인수인계 `model/firmware-handoff.md`
+- [ ] 아주 가까운 얼굴(화면 가득) 못 잡음 → `build_dataset.py` 얼굴 크기 범위 15~55% → 15~90%로 넓혀 재학습(v20). 같은 arena·임계값이면 모델 배열 파일만 바뀌어 재컴파일이 짧다
 - [ ] v18(EON)은 보드 미측정 — 필요하면 시험. 얼굴 없음 오탐·옆모습·1~2m는 팀원4 측정으로 확정
+- [x] 사이트 후보 8개와 96468 선택 이유를 `experiments.md` 0단계에 추가(세션 로그에서 복원, 상세 확인은 2개뿐)
 
 **팀원4 (시연 데이터·실제 정확도 측정)** — 시작 문서 `model/testing/README.md`
 - [ ] 환경 준비(`conda` 환경 `ztmc` + `pip install -r model/testing/requirements.txt` + Mosquitto)
@@ -49,6 +52,8 @@
 - [ ] `run_inference()` TODO 채우기 → `USE_FAKE_DETECT 0`, `infer_ms`·`dsp_ms` 실제 값
 
 **팀원3 (브로커·서버·웹)**
+- [x] 얼굴 감지 신호 모니터: 터미널 `python tools\monitor.py`(브로커 직접 구독, 서버 없이도 됨), 웹 <http://localhost:8000/monitor.html>
+- [ ] 실제 보드 신호를 `tools\monitor.py`로 확인(팀원2 `USE_FAKE_DETECT 1` 업로드 후)
 - [ ] 시연 PC Windows 방화벽 1883 인바운드 허용 — 관리자 PowerShell:
       `New-NetFirewallRule -DisplayName "Mosquitto 1883" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow`
 - [ ] 브라우저에서 유튜브 재생/정지 실제 확인, 웹 페이지 다듬기(`docs/05-web.md`)

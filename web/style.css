@@ -15,3 +15,29 @@ main { max-width: 960px; margin: 0 auto; padding: 0 16px 24px; }
 body[data-state="present"] #state { color: var(--ok); }
 body[data-state="absent"] #state { color: var(--warn); }
 body[data-state="no_device"] #state { color: var(--off); }
+
+/* ---------- 모니터 페이지 (monitor.html) ---------- */
+nav { display: flex; align-items: center; gap: 12px; }
+nav a { color: var(--muted); }
+h2 { font-size: .95rem; color: var(--muted); margin: 20px 0 6px; }
+.monitor section { margin-top: 12px; }
+#face { padding: 28px 16px; border-radius: 12px; text-align: center; color: #fff; background: var(--off); transition: background .15s; }
+#face[data-face="yes"] { background: var(--ok); }
+#face[data-face="no"] { background: var(--warn); }
+#face-label { font-size: clamp(1.8rem, 7vw, 3rem); font-weight: 700; }
+#face-sub { opacity: .85; margin-top: 4px; }
+#score .row { display: flex; justify-content: space-between; }
+#bar { position: relative; height: 14px; background: #e3e2de; border-radius: 7px; overflow: hidden; margin-top: 4px; }
+#bar-fill { height: 100%; width: 0; transition: width .1s; }
+#bar-fill.ok { background: var(--ok); }
+#bar-fill.low { background: var(--warn); }
+#bar-th { position: absolute; top: 0; bottom: 0; left: 60%; width: 2px; background: var(--fg); }
+#stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+#stats div { background: #fff; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; }
+#stats span { font-size: .8rem; color: var(--muted); }
+#timeline { width: 100%; height: 80px; background: #fff; border-radius: 8px; display: block; }
+#log { list-style: none; padding: 0; margin: 0; font: .85rem/1.5 ui-monospace, Consolas, monospace; max-height: 240px; overflow-y: auto; }
+#log .on { color: var(--ok); }
+#log .off { color: var(--warn); }
+#log .warn { color: #b8860b; }
+#log .state { font-weight: 700; }

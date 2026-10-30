@@ -9,6 +9,7 @@
 6. 공개 원본 모델 zip도 먼저 받아 팀원2에게 넘긴다 — 팀원2가 학습을 기다리지 않고 바로 이식을 시작할 수 있다.
 
 ## 기록 (발표 자료용)
+선택 과정 전체(후보 고르기 → Edge Impulse 개선 → 로컬 학습 → 보드 실측)는 [model-selection.md](model-selection.md).
 실험 전체와 이유는 [experiments.md](experiments.md). F1은 test set(float32), RAM·Flash·추정 ms는 int8 + EON의 ESP-EYE 추정치.
 보드 추론 ms는 XIAO ESP32S3 Sense 실측(카메라 입력 스케치). 인수인계는 [firmware-handoff.md](firmware-handoff.md).
 
