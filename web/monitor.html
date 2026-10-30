@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZTMC Monitor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="monitor">
+  <!-- 얼굴 감지 신호 실시간 대시보드. 서버 /ws/player의 detect·state를 보여 주기만 한다(재생 판단 없음). -->
+  <header>
+    <h1>Zero-Touch Media · 모니터</h1>
+    <nav><a href="/">플레이어</a> <span id="conn" class="badge off">서버 연결 중…</span></nav>
+  </header>
+
+  <main>
+    <section id="face" data-face="none">
+      <div id="face-label">신호 기다리는 중</div>
+      <div id="face-sub">-</div>
+    </section>
+
+    <section id="cam-card">
+      <div class="row">
+        <h2>내 얼굴 (PC 웹캠)</h2>
+        <div><button id="cam-on" type="button">웹캠 켜기</button> <button id="cam-pip" type="button" disabled>PiP 창으로</button> <span id="cam-msg"></span></div>
+      </div>
+      <!-- PC 웹캠은 보드 카메라와 위치·각도가 다르다. 감지 결과는 보드 기준. -->
+      <div id="cam" data-face="none" hidden>
+        <video id="cam-video" autoplay muted playsinline></video>
+        <span id="cam-badge">신호 기다리는 중</span>
+      </div>
+    </section>
+
+    <section id="score">
+      <div class="row"><span>신뢰도</span><strong id="score-val">-</strong></div>
+      <div id="bar"><div id="bar-fill"></div><div id="bar-th" title="MIN_SCORE"></div></div>
+    </section>
+
+    <section id="stats">
+      <div><span>서버 판정</span><strong id="state">-</strong></div>
+      <div><span>장치</span><strong id="device">-</strong></div>
+      <div><span>수신 빈도</span><strong id="hz">-</strong></div>
+      <div><span>추론 / DSP</span><strong id="infer">-</strong></div>
+      <div><span>받은 메시지</span><strong id="count">0</strong></div>
+    </section>
+
+    <section>
+      <h2>최근 30초</h2>
+      <canvas id="timeline" height="80"></canvas>
+    </section>
+
+    <section>
+      <h2>기록</h2>
+      <ol id="log"></ol>
+    </section>
+  </main>
+
+  <script src="campip.js"></script>
+  <script src="monitor.js"></script>
+</body>
+</html>
