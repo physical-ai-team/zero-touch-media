@@ -18,3 +18,11 @@
 // 1 이면 카메라·모델 없이 5초마다 얼굴 있음/없음을 번갈아 보낸다(연결 시험용).
 // Edge Impulse 모델을 붙이면 0 으로 바꾼다.
 #define USE_FAKE_DETECT 1
+
+// 카메라 화면(JPEG)을 ztmc/{id}/frame 으로 보내는 간격(ms). 웹 PiP 창 표시용, 판정에는 안 쓴다.
+// Wi-Fi 가 약해 detect 가 밀리면 늘리거나 0(끔)으로.
+#define FRAME_INTERVAL_MS 500
+
+// 주석을 풀면(또는 빌드 옵션 -DCAPTURE_MODE) 추론 대신 모델 입력을 흑백 'FRAME W H <hex>'로 시리얼에 내보낸다.
+// 팀원4 model/testing/capture.py 로 사진을 모을 때만 쓴다. USE_FAKE_DETECT 0 일 때만 동작.
+// #define CAPTURE_MODE

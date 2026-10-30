@@ -24,6 +24,7 @@
 - 역할: 팀원1 박민성(모델), 팀원2(펌웨어), 팀원3(브로커·서버·웹), 팀원4(시연 데이터·실제 정확도 측정, 10-30 합류) — 팀원2·3·4 이름은 정해지면 `CLAUDE.md`·`docs/07-team.md`에 적는다.
 - 보드: ESP32-S3, PSRAM 8MB, 플래시 8MB(esptool 확인). XIAO ESP32S3 Sense로 추정, 정확한 보드명 미확인.
 - 실제 보드 확인(팀원2): `USE_FAKE_DETECT 1` 업로드 → 폰 핫스팟 Wi-Fi → MQTT → 서버 → 웹 유튜브 재생/정지까지 동작. 보드 Wi-Fi 수신이 약함(공유기 앞 -65 dBm, 자리 -92 dBm) → 안테나 점검 전까지 핫스팟을 보드 가까이.
+- **실제 추론 펌웨어(팀원2)**: v19 모델로 카메라 → 추론 → MQTT detect(dsp 2ms, infer 51ms, 초당 약 7회) + 카메라 JPEG `frame`(초당 2장, 웹 PiP용). 앉은 정면 평균 score 0.92. EON 크래시 원인(`ei_calloc` 정렬)을 찾아 펌웨어에서 해결. 상세 `docs/04-firmware.md` "위험·겪은 문제".
 - 설계 근거: `docs/superpowers/specs/2026-10-30-skeleton-design.md`, `docs/decisions.md`.
 
 ## 남은 일
@@ -46,11 +47,15 @@
 - [ ] 새 모델이 오면 같은 조건으로 다시 측정해 버전 비교
 
 **팀원2 (펌웨어)**
-- [ ] 보드명 확인 후 `docs/04-firmware.md` 보드 줄 고치기
+- [x] 보드 줄 고치기(팀원4가 실측값으로), 카메라 센서는 OV3660 확인
 - [x] `config.h` 만들고 `USE_FAKE_DETECT 1`로 업로드 → `mosquitto_sub -t "ztmc/#" -v`로 hello/detect 확인
 - [ ] 안테나(U.FL) 연결 점검 — 공유기 앞에서도 -65 dBm. 정상이면 -30~-40 dBm
-- [ ] Edge Impulse 라이브러리가 ESP32 코어 3.3.12에서 빌드되는지 확인(안 되면 2.0.17, `decisions.md` 기록)
-- [ ] `run_inference()` TODO 채우기 → `USE_FAKE_DETECT 0`, `infer_ms`·`dsp_ms` 실제 값
+- [x] Edge Impulse 라이브러리 코어 3.3.12 빌드 확인(v17 EON·v19 둘 다, 코어 내릴 필요 없음)
+- [x] `run_inference()` 구현 → `USE_FAKE_DETECT 0`, v19로 `infer_ms` 51·`dsp_ms` 2 실측
+- [x] `frame` 토픽 펌웨어 쪽 구현(`FRAME_INTERVAL_MS`, 기본 500) — 서버가 받는 것 확인(10초 17장, bad 0). 웹 PiP 표시는 브라우저 확인 필요
+- [x] 캡처 모드(`CAPTURE_MODE`) — 팀원4 `capture.py`로 3장 저장 확인
+- [ ] 얼굴 없음 오탐률·판정값(`FACE_THRESHOLD`) 확정 — 팀원3·4 측정과 같이
+- [ ] 팀원1에게: EON 크래시 원인은 `ei_calloc` 정렬(펌웨어에서 해결) → `model/firmware-handoff.md` "피해야 할 것" 갱신 요청
 
 **팀원3 (브로커·서버·웹)**
 - [x] 얼굴 감지 신호 모니터: 터미널 `python tools\monitor.py`(브로커 직접 구독, 서버 없이도 됨), 웹 <http://localhost:8000/monitor.html>

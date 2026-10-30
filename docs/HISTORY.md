@@ -58,3 +58,17 @@
 - 서버: `frame`은 판정에 안 쓰고 `PLAYER_FRAME_HZ`(5)로 줄여 전달, JPEG 아님·`FRAME_MAX_BYTES` 초과는 버림. `.env.example`에 두 키 추가. 시험 1개 추가(15 통과).
 - 가짜 ESP32: Pillow로 320×240 흑백 가짜 화면(얼굴 있음이면 웃는 얼굴) 2fps, `--frame-hz 0`으로 끔. `requirements-dev.txt`에 pillow 추가. 터미널 모니터에 영상 fps·크기 표시.
 - 시험: 따로 띄운 서버(8001, 접두어 ztmctest) + 가짜 ESP32: 서버 frame 9 / bad 0, 플레이어 페이지가 blob JPEG 받음, monitor.py "영상 2.0fps".
+
+## 2026-10-30 실제 추론 펌웨어 (팀원2)
+- `run_inference()` 구현: XIAO Sense 카메라(OV3660, PID 0x3660) QVGA JPEG → `fmt2rgb888` → 가운데 정사각 크롭·축소 → `run_classifier`. `score`는 모델 기준을 `EI_MIN_SCORE` 0.1로 낮춰 최고값 그대로, `face`/`count`는 `FACE_THRESHOLD`.
+- v17(공개 원본, EON) 첫 추론에서 `CORRUPT HEAP` → `tflite_learn_*_reset` → `ei_free`. 원인: SDK `ei_calloc`이 IDF 5에서 `heap_caps_calloc`(정렬 없음) — 같은 파일 `ei_malloc`은 esp-nn issue #7 때문에 16바이트 정렬함. 펌웨어에 `heap_caps_aligned_calloc(16, …)` 버전으로 덮어써(weak) 해결. 팀원1이 겪은 v17 크래시와 같은 증상.
+- ESP-NN 끄기 시험(`--build-property compiler.c(pp).extra_flags=-DEI_CLASSIFIER_TFLITE_ENABLE_ESP_NN=0`)은 적용됨(추론 143→3597ms) — 점수 0 문제는 ESP-NN 탓 아님.
+- 점수 0 원인 찾기: Studio Raw features로 static buffer 시험 → 보드 face 0.996(Studio와 일치) → 모델·SDK 정상. 시리얼 스냅샷(`s`)으로 본 입력이 (1) 상하 뒤집힘(넣었던 vflip이 이 모듈엔 불필요) (2) 빨강·파랑 바뀜(코어 3.3.x `fmt2rgb888`은 RGB인데 EI 예제는 BGR로 뒤집음) → 둘 다 고침.
+- v17은 그래도 우리 카메라 영상(뿌옇고 대비 낮음)에 약함: 같은 사진이 원본 0.1 미만, 채널별 1~99% 대비 늘리기 후 0.86. 대비 보정 넣고 앉은 상태 face 64%, 빈자리 오탐 2.5%. 다만 화면을 보는 자연스러운 자세에서는 평균 0.11로 떨어짐.
+- v19(팀원1, SHA256 일치)로 교체: dsp 2ms·infer 51ms, 초당 약 7회. **대비 보정은 v19에서 역효과**(앉은 상태 0.7 이상 37/102 → 끄니 95/102, 평균 0.53 → 0.92) → 제거.
+- USB 시리얼 막힘: PC가 시리얼을 안 읽으면 detect 초당 4 → 0.4. `Serial.setTxTimeoutMs(0)`로 해결(10초 4개 → 39개). 서버가 잠깐 `no_device`로 바뀌던 원인.
+- `frame` 펌웨어 쪽: 카메라가 이미 JPEG라 변환 없이 `beginPublish/write/endPublish`, `FRAME_INTERVAL_MS` 500. 장당 약 8KB, 10초 detect 68·frame 17·bad 0(detect 속도 그대로).
+- 캡처 모드 `CAPTURE_MODE`: 모델 입력을 흑백 `FRAME W H <hex>`로 → 팀원4 `capture.py`로 3장 저장 확인.
+- 카메라 위치: 모니터 옆에 두면 화면을 볼 때 옆얼굴 → 거의 못 잡음. 모니터 위 가운데.
+- 웹(팀원3에게 전달): `index.html`이 `iframe_api`를 `app.js`보다 먼저 불러, API가 캐시로 빨리 준비되면 `onYouTubeIframeAPIReady`가 정의 전에 지나가 "플레이어가 준비되지 않았습니다"에 멈춤(campip.js 추가 후 재현).
+- 이 PC 로컬값(git 아님): `FACE_THRESHOLD` 0.7, 서버 `.env` `FACE_ON_MS` 500. 팀 기본값은 그대로(0.6 / 300).
