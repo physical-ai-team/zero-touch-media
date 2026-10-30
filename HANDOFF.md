@@ -34,7 +34,7 @@
 - [x] 로컬 학습 L3 → **v19 zip**(WIDER 검증 F1 0.748 vs v18 0.642, PC 추론 절반, TFLite Micro). 기록 `model/experiments.md`, zip `C:\dev\ei-zips\` → 창2(펌웨어 세션)에 전달
 - [x] v19 보드 실측: 크래시 없음(v17 EON은 크래시), 추론 50ms·dsp 2ms, 정면 50~80cm 감지. **v19 유지** (`model/experiments.md` 보드 실측 절)
 - [ ] 아주 가까운 얼굴(화면 가득) 못 잡음 → `build_dataset.py` 얼굴 크기 범위 15~55% → 15~90%로 넓혀 재학습(v20). 같은 arena·임계값이면 모델 배열 파일만 바뀌어 재컴파일이 짧다
-- [ ] 사이트(Edge Impulse 공개 프로젝트) 후보 비교와 96468 선택 이유를 `experiments.md`에 추가
+- [x] 사이트 후보 8개와 96468 선택 이유를 `experiments.md` 0단계에 추가(세션 로그에서 복원, 상세 확인은 2개뿐)
 
 **팀원4 (시연 데이터·실제 정확도 측정)** — 시작 문서 `model/testing/README.md`
 - [ ] 환경 준비(`conda` 환경 `ztmc` + `pip install -r model/testing/requirements.txt` + Mosquitto)

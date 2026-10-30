@@ -14,6 +14,22 @@
 | 공개 원본 | https://studio.edgeimpulse.com/public/96468/latest | Louis Moreau, FFHQ 일부 406장, 96×96 흑백, BSD-3-Clause-Clear |
 | 우리 복제본 | https://studio.edgeimpulse.com/studio/1152773 | `ztmc-face-fomo` (비공개, 계정 minff) |
 
+## 0단계: 사이트 후보 고르기 (10-30 오전)
+Edge Impulse 공개 프로젝트 검색 "Face detection"(object detection) 결과 8개. 기준: **ESP32-S3에서 돌 만큼 작고(FOMO), 흑백 입력, 라벨이 `face` 하나, 바로 복제·배포 가능**.
+상세 페이지까지 연 것은 2개, 나머지는 검색 결과 이름으로만 판단했다(그 자리에서 기록하지 않아 10-30 오후에 세션 로그에서 복원).
+
+| 후보 | 구조·입력 | 데이터 | 판단 |
+|---|---|---|---|
+| **Louis Moreau / Face detection - FOMO - Embedded Online Conference (public/96468)** | FOMO MNv2 0.1, **96×96 흑백** | FFHQ 일부 406장 | **선택** — 가장 작은 FOMO, 흑백, 라벨 `face` 하나. 공개 페이지 정확도 val 77.6%, test 53.4% |
+| Developer Relations / Face detection - FOMO - bigger dataset (public/116394) | FOMO MNv2 0.35, 96×96 **RGB** | FFHQ(수동 라벨, 더 많음) | 탈락 — RGB·0.35라 더 무겁다. 데이터가 많은 장점은 우리 재학습(증강·WIDER)으로 대신 |
+| Demo Team / FOMO: Face Detection 96x96 RGB | FOMO, RGB | – | 이름만 봄. RGB라 흑백 96468보다 무거움 |
+| Dmitry / Face detection - FOMO, Charity / Face detection - FOMO | FOMO | – | 이름만 봄. 같은 계열이라 원본 격인 96468로 대표 |
+| Edge Impulse Experts / Face Detection (YOLOpro) | YOLO 계열 | – | 이름만 봄. ESP32-S3에는 무겁다 |
+| Alif Semiconductor / Face detection with FOMO and YOLOv5 | FOMO + YOLOv5 | – | 이름만 봄. Alif 보드용·YOLOv5 무거움 |
+| Edge Impulse Experts / Face detection for AI Bell | – | – | 이름만 봄. 특정 장치용 |
+
+한계: 후보끼리 같은 테스트셋으로 정확도를 재지는 않았다. 대신 고른 96468을 출발점으로 학습 설정·입력 크기·데이터를 바꿔 개선했다(아래 실험).
+
 ## 실험 표
 F1·P·R은 test set(float32, 88장 137개 얼굴) 값. Model testing에서 int8은 무료 계정이라 선택 불가. ms·RAM·Flash는 int8 + EON, ESP-EYE 추정.
 
