@@ -37,6 +37,7 @@
 - [ ] 아주 가까운 얼굴(화면 가득) 못 잡음 → `build_dataset.py` 얼굴 크기 범위 15~55% → 15~90%로 넓혀 재학습(v20). 같은 arena·임계값이면 모델 배열 파일만 바뀌어 재컴파일이 짧다
 - [ ] v18(EON)은 보드 미측정 — 필요하면 시험. 얼굴 없음 오탐·옆모습·1~2m는 팀원4 측정으로 확정
 - [x] 사이트 후보 8개와 96468 선택 이유를 `experiments.md` 0단계에 추가(세션 로그에서 복원, 상세 확인은 2개뿐)
+- [x] 공개 87291(FOMO 0.35 RGB 96) vs v19 비교(WIDER val): 87291 최고 F1 0.60 vs v19 0.748, 추론 3배 느림 → **v19 유지**. 상세 `experiments.md` 끝 절
 
 **팀원4 (시연 데이터·실제 정확도 측정)** — 시작 문서 `model/testing/README.md`
 - [ ] 환경 준비(`conda` 환경 `ztmc` + `pip install -r model/testing/requirements.txt` + Mosquitto)
