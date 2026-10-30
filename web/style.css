@@ -41,3 +41,17 @@ h2 { font-size: .95rem; color: var(--muted); margin: 20px 0 6px; }
 #log .off { color: var(--warn); }
 #log .warn { color: #b8860b; }
 #log .state { font-weight: 700; }
+
+/* 웹캠 박스 (페이지 안 / PiP 창 안 공통) */
+#cam-card .row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+#cam-card h2 { margin: 0; }
+#cam { position: relative; max-width: 480px; margin-top: 8px; border-radius: 10px; overflow: hidden; background: #000; border: 4px solid var(--off); }
+#cam[data-face="yes"] { border-color: var(--ok); }
+#cam[data-face="no"] { border-color: var(--warn); }
+#cam video { display: block; width: 100%; transform: scaleX(-1); }  /* 거울처럼 */
+#cam-badge { position: absolute; left: 8px; top: 8px; padding: 4px 10px; border-radius: 999px; color: #fff; font-weight: 700; font-size: .9rem; background: var(--off); }
+#cam[data-face="yes"] #cam-badge { background: var(--ok); }
+#cam[data-face="no"] #cam-badge { background: var(--warn); }
+body.pip { margin: 0; background: #000; }
+body.pip #cam { max-width: none; margin: 0; height: 100vh; border-radius: 0; }
+body.pip #cam video { height: 100%; object-fit: cover; }

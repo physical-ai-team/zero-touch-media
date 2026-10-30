@@ -19,6 +19,18 @@
       <div id="face-sub">-</div>
     </section>
 
+    <section id="cam-card">
+      <div class="row">
+        <h2>내 얼굴 (PC 웹캠)</h2>
+        <div><button id="cam-on" type="button">웹캠 켜기</button> <button id="cam-pip" type="button" disabled>PiP 창으로</button></div>
+      </div>
+      <!-- PC 웹캠은 보드 카메라와 위치·각도가 다르다. 감지 결과는 보드 기준. -->
+      <div id="cam" data-face="none" hidden>
+        <video id="cam-video" autoplay muted playsinline></video>
+        <span id="cam-badge">신호 기다리는 중</span>
+      </div>
+    </section>
+
     <section id="score">
       <div class="row"><span>신뢰도</span><strong id="score-val">-</strong></div>
       <div id="bar"><div id="bar-fill"></div><div id="bar-th" title="MIN_SCORE"></div></div>
