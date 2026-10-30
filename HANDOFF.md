@@ -22,6 +22,7 @@
 - 확인 못 함: 브라우저에서 유튜브 실제 재생/정지, 실제 보드 업로드·MQTT 접속, Edge Impulse 모델.
 - 역할: 팀원1 박민성(모델), 팀원2(펌웨어), 팀원3(브로커·서버·웹) — 팀원2·3 이름은 정해지면 `CLAUDE.md`·`docs/07-team.md`에 적는다.
 - 보드: ESP32-S3, PSRAM 8MB, 플래시 8MB(esptool 확인). XIAO ESP32S3 Sense로 추정, 정확한 보드명 미확인.
+- 실제 보드 확인(팀원2): `USE_FAKE_DETECT 1` 업로드 → 폰 핫스팟 Wi-Fi → MQTT → 서버 → 웹 유튜브 재생/정지까지 동작. 보드 Wi-Fi 수신이 약함(공유기 앞 -65 dBm, 자리 -92 dBm) → 안테나 점검 전까지 핫스팟을 보드 가까이.
 - 설계 근거: `docs/superpowers/specs/2026-10-30-skeleton-design.md`, `docs/decisions.md`.
 
 ## 남은 일
@@ -32,7 +33,8 @@
 
 **팀원2 (펌웨어)**
 - [ ] 보드명 확인 후 `docs/04-firmware.md` 보드 줄 고치기
-- [ ] `config.h` 만들고 `USE_FAKE_DETECT 1`로 업로드 → `mosquitto_sub -t "ztmc/#" -v`로 hello/detect 확인
+- [x] `config.h` 만들고 `USE_FAKE_DETECT 1`로 업로드 → `mosquitto_sub -t "ztmc/#" -v`로 hello/detect 확인
+- [ ] 안테나(U.FL) 연결 점검 — 공유기 앞에서도 -65 dBm. 정상이면 -30~-40 dBm
 - [ ] Edge Impulse 라이브러리가 ESP32 코어 3.3.12에서 빌드되는지 확인(안 되면 2.0.17, `decisions.md` 기록)
 - [ ] `run_inference()` TODO 채우기 → `USE_FAKE_DETECT 0`, `infer_ms`·`dsp_ms` 실제 값
 
