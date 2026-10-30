@@ -27,7 +27,7 @@
 - 대신 WIDER FACE(HF `CUHK-CSE/wider_face`)에서 시연 상황처럼 얼굴이 화면 10~60%인 정사각형을 잘라 64×64 흑백 FOMO 데이터 생성(`model/train/build_dataset.py`, 학습 41,067장·검증 5,105장).
 - `model/train/train_fomo.py`: EI FOMO와 같은 구조(MNv2 앞부분 block_6_expand_relu + 1×1 머리, 출력 8×8×2)로 학습 → int8 TFLite. `swap_model.py`: v18 라이브러리의 EON 모델을 TFLite Micro(`EI_CLASSIFIER_COMPILED 0`, AllOpsResolver)로 바꿔 끼움 — DSP·후처리·라벨 그대로라 펌웨어 수정 불필요.
 - `model/train/pc_harness/`: EI 라이브러리를 PC(MinGW g++ 16)에서 그대로 돌려 검증셋 F1 측정. E3(v18 EON)은 5,105장 연속 실행에 크래시 없음(평균 9.9ms, PC) — 보드 추론 크래시는 모델 코드보다 ESP-NN/코어 쪽 의심. **E3 WIDER 검증 F1 0.642**(P 0.66 R 0.62)를 기준선으로.
-- 실패 교훈: 한글 사용자 폴더 Temp 때문에 TF 저장·TFLite 변환·MinGW 링크가 실패 → `TMP/TEMP`를 `C:\dev\ztm-data	mp`로, g++는 `C:\dev\mingw64`로 복사. 학습 2개를 동시에 돌려 RAM 4.6GB를 써서 보드 세션 빌드가 메모리 부족으로 중단됨 → 학습은 한 번에 하나.
+- 실패 교훈: 한글 사용자 폴더 Temp 때문에 TF 저장·TFLite 변환·MinGW 링크가 실패 → `TMP/TEMP`를 `C:\dev\ztm-data\tmp`로, g++는 `C:\dev\mingw64`로 복사. 학습 2개를 동시에 돌려 RAM 4.6GB를 써서 보드 세션 빌드가 메모리 부족으로 중단됨 → 학습은 한 번에 하나.
 - 첫 학습(얼굴 가중치 100): 재현율 0.98·정밀도 0.34로 오탐 과다. 가중치 10 + 가려진 얼굴 무시로 다시 학습 중(L3, 20에폭 float F1 0.735).
 - 팀원4 합류 → `model/testing/`: `measure.py`(MQTT detect를 상황 11개별로 모아 감지율·오탐률 표), `capture.py`(캡처 모드 시리얼 FRAME → PNG). 가짜 ESP32·가상 시리얼로 동작 확인.
 
