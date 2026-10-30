@@ -31,7 +31,8 @@
 - [x] 비교 실험 6개 → **E3 64×64 흑백 채택**(test F1 0.69→0.82, 추정 728→280ms) → v18 zip. 기록 `model/experiments.md`, zip `C:\dev\ei-zips\`
 - [ ] 팀원2에게 v17·v18 zip 전달(이 PC의 컴파일 세션에는 전달함), 보드 실측 `infer_ms`를 받아 `model/README.md` 표 채우기
 - [ ] (시간 남으면) 시연 장소·카메라로 찍은 얼굴/배경 사진을 추가 학습 → 오탐 줄이기 (사진은 팀원4가 모아 줌)
-- [ ] 로컬 학습(Edge Impulse 무료 학습 시간 소진 → `model/train/`, WIDER FACE) 결과가 E3보다 나으면 새 zip(`swap_model.py`, TFLite Micro) 전달. 비교 기준: WIDER 검증 5,105장에서 E3 F1 0.642(PC 하네스 `model/train/pc_harness/`)
+- [x] 로컬 학습 L3 → **v19 zip**(WIDER 검증 F1 0.748 vs v18 0.642, PC 추론 절반, TFLite Micro). 기록 `model/experiments.md`, zip `C:\dev\ei-zips\` → 창2(펌웨어 세션)에 전달
+- [ ] v19 보드 실측(`infer_ms`, 팀원4 측정)으로 v18과 비교해 최종 확정
 
 **팀원4 (시연 데이터·실제 정확도 측정)** — 시작 문서 `model/testing/README.md`
 - [ ] 환경 준비(`conda` 환경 `ztmc` + `pip install -r model/testing/requirements.txt` + Mosquitto)
