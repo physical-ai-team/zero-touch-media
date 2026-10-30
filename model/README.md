@@ -16,7 +16,7 @@
 |---|---|---|---|---|---|---|---|---|---|
 | 공개 원본 (zip v17) | [public/96468](https://studio.edgeimpulse.com/public/96468/latest) → 복제 [1152773](https://studio.edgeimpulse.com/studio/1152773) impulse 1 | 96×96 흑백 | FOMO MNv2 0.1 | 0.69 | 240K | 63.6K | 728 | | 10-30 |
 | 우리 학습 v1 (zip v18, E3) | [1152773](https://studio.edgeimpulse.com/studio/1152773) impulse 5 | **64×64** 흑백 | FOMO MNv2 0.1, LR 0.001, 증강 | **0.82** | **69K** | 68.8K | **280** | | 10-30 |
-| 우리 학습 v2 (zip v19, L3, **로컬**) | `model/train/` (WIDER FACE, EI 학습 시간 소진으로 로컬) | 64×64 흑백 | FOMO MNv2 0.1(처음부터), 얼굴 가중치 10, 임계값 0.6, TFLite Micro | WIDER 검증 **0.748** (같은 기준 v18 0.642) | arena 128K | 모델 41K | PC 4.4ms (v18 9.9ms) | | 10-30 |
+| 우리 학습 v2 (zip v19, L3, **로컬**) | `model/train/` (WIDER FACE, EI 학습 시간 소진으로 로컬) | 64×64 흑백 | FOMO MNv2 0.1(처음부터), 얼굴 가중치 10, 임계값 0.6, TFLite Micro | WIDER 검증 **0.748** (같은 기준 v18 0.642) | arena 128K | 모델 41K | PC 4.4ms (v18 9.9ms) | **50** (dsp 2) | 10-30 |
 
 zip 위치(이 PC): `C:\dev\ei-zips\` — git에 올리지 않는다.
 
